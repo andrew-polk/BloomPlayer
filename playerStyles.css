@@ -1,0 +1,21 @@
+#playerToolbar{
+    position: fixed;
+    top: 0;
+    /*height: 50px;*/
+    background-color: #363333;
+    width: 100%;
+    color: white;
+    padding: 10px;
+}
+.bloom-page{
+    display: none !important;
+}
+body{
+     transform-origin: left top;
+}
+.bloom-page.currentPage{
+    display: block !important;
+}
+.bloom-page::after{
+    content:'';
+}

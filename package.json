@@ -1,0 +1,14 @@
+{
+  "name": "bloomplayer",
+  "version": "0.0.1",
+  "description": "Reader/Player for Bloom Books",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "SIL International",
+  "license": "MIT",
+  "devDependencies": {
+    "babel-cli": "^6.8.0"
+  }
+}
