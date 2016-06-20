@@ -38,3 +38,5 @@ Daniel in the Lion's Den
 *.keystore
 
 *.zip
+
+output/
