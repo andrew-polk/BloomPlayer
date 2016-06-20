@@ -9,6 +9,13 @@
   "author": "SIL International",
   "license": "MIT",
   "devDependencies": {
-    "babel-cli": "^6.8.0"
+    "babel-cli": "^6.8.0",
+    "globule": "^1.0.0",
+    "less": "^2.7.1",
+    "less-loader": "^2.2.3",
+    "style-loader": "^0.13.1",
+    "ts-loader": "^0.8.2",
+    "typescript": "^1.8.10",
+    "webpack": "^1.13.1"
   }
 }
