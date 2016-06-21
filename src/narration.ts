@@ -1,4 +1,4 @@
-import {PageVisible, PageHidden} from './navigation';
+import {PageVisible, PageHidden, gotoNextPage} from "./navigation";
 
 export function SetupNarration() : void{
     PageVisible.subscribe(page =>{

@@ -1,10 +1,10 @@
-import {PageVisible, PageHidden} from './navigation';
+import {PageVisible, PageHidden} from "./navigation";
 
-export function SetupMusic() : void{
-    PageVisible.subscribe(page =>{
-
-    })
-    PageHidden.subscribe(page =>{
-        
-    })
+export function SetupMusic() : void {
+    PageVisible.subscribe(page => {
+        //TODO
+    });
+    PageHidden.subscribe(page => {
+        //TODO
+    });
 }

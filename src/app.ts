@@ -1,15 +1,15 @@
-import {SetupNavigation} from './navigation';
-import {SetupLayout} from './layout';
-import {SetupAnimation} from './animation';
-import {SetupMusic} from './music';
-import {SetupNarration} from './narration';
+import {setupNavigation} from "./navigation";
+import {SetupLayout} from "./layout";
+import {SetupAnimation} from "./animation";
+import {SetupMusic} from "./music";
+import {SetupNarration} from "./narration";
 
-function attach(){
-    SetupNavigation();
+function attach() {
+    setupNavigation();
     SetupLayout();
     SetupAnimation();
     SetupMusic();
     SetupNarration();
 }
 
-document.addEventListener('DOMContentLoaded', attach, false);
+document.addEventListener("DOMContentLoaded", attach, false);
