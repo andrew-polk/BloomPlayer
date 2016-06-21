@@ -1,11 +1,11 @@
-import {setupNavigation} from "./navigation";
+import Navigation from "./navigation";
 import {SetupLayout} from "./layout";
 import {SetupAnimation} from "./animation";
 import {SetupMusic} from "./music";
 import {SetupNarration} from "./narration";
 
 function attach() {
-    setupNavigation();
+    new Navigation().setupNavigation();
     SetupLayout();
     SetupAnimation();
     SetupMusic();

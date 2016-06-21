@@ -1,6 +1,7 @@
 {
     "extends": "tslint:latest",
     "rules": {
-        "comment-format": false
+        "comment-format": false,
+        "no-console": false
     }
 }

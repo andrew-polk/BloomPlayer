@@ -1,5 +1,5 @@
-/* tslint:disable: no-unused-variable */
-import {PageVisible, PageHidden, gotoNextPage} from "./navigation";
+/* tslint:disable */
+import {PageVisible, PageHidden} from "./navigation";
 
 export function SetupNarration() : void{
     PageVisible.subscribe(page =>{
@@ -35,13 +35,13 @@ class Narration {
         this.setStatus('listen', Status.Active);
         this.playCurrentInternal();
     }
-    
+
     // Returns all elements that match CSS selector {expr} as an array.
     // Querying can optionally be restricted to {container}’s descendants
     static findAll(expr : string, container: HTMLElement) : HTMLElement[] {
 	    return [].slice.call((container || document).querySelectorAll(expr));
     }
-    
+
     static getRecordableDivs() : HTMLElement[] {
         return this.findAll('div.bloom-editable.bloom-content1', this.playerPage);
     }
@@ -49,7 +49,7 @@ class Narration {
     static getAudioElements() : HTMLElement[] {
         return [].concat.apply([], this.getRecordableDivs().map(x => this.findAll('.audio-sentence', x)));
     }
-    
+
     static setCurrentSpan(current: Element, changeTo: HTMLElement): void {
         if (current)
             this.removeClass(current, 'ui-audioCurrent');
@@ -58,21 +58,21 @@ class Narration {
         this.updatePlayerStatus();
         //this.changeStateAndSetExpected('record');
     }
-    
+
     static removeClass(elt: Element, className: string) {
         var index = elt.className.indexOf(className);
         if (index >= 0) {
             elt.className = elt.className.slice(0,index) + elt.className.slice(index + className.length, elt.className.length);
         }
     }
-    
+
     static addClass(elt: HTMLElement, className: string) {
         var index = elt.className.indexOf(className);
         if (index < 0) {
             elt.className = elt.className + ' ' + className;
         }
     }
-    
+
     static getPlayer() : HTMLMediaElement {
          var player  = document.querySelector('#player');
          if (!player) {
@@ -80,38 +80,38 @@ class Narration {
              player.setAttribute('id', 'player');
              document.body.appendChild(player);
              player.addEventListener('ended', () => this.playEnded()); // if we just pass the function, it has the wrong 'this'
-         } 
-         return <HTMLMediaElement>player; 
+         }
+         return <HTMLMediaElement>player;
     }
-    
+
     // Gecko has no way of knowing that we've created or modified the audio file,
     // so it will cache the previous content of the file or
     // remember if no such file previously existed. So we add a bogus query string
     // based on the current time so that it asks the server for the file again.
     // Fixes BL-3161
     static updatePlayerStatus() {
-        var player  = this.getPlayer();   
+        var player  = this.getPlayer();
         player.setAttribute('src', this.currentAudioUrl( this.idOfCurrentSentence)+"?nocache="+new Date().getTime());
     }
-    
+
     static currentAudioUrl(id: string): string{
         return this.urlPrefix() + id + '.wav';
-    } 
-    
+    }
+
     static  urlPrefix():string{
         var bookSrc = document.URL;
         var index = bookSrc.lastIndexOf('/');
         var bookFolderUrl = bookSrc.substring(0, index + 1);
         return bookFolderUrl+'audio/';
     }
-    
+
     static setStatus(which: string, to: Status): void {
     }
-    
+
     static playCurrentInternal() {
         this.getPlayer().play();
     }
-    
+
     static playEnded(): void {
         if (this.playingAll) {
             var current: Element = this.playerPage.querySelector('.ui-audioCurrent');

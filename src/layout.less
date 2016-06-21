@@ -1,15 +1,14 @@
 #pages-carousel{
      display: flex;
      flex-direction: row;
-     left:0;
+     //when we do the transform: scale(n), which is done via code, we want
+     //to still stick to the upper left corner
+     transform-origin: left top 0px;
 }
 
-.bloom-page{
-   display: none !important;
-}
 
 body{
-     transform-origin: left top;
+     overflow: hidden;
 }
 .bloom-page.currentPage{
     display: block !important;
