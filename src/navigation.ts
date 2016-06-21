@@ -1,14 +1,21 @@
 import "./navigation.less";
 import LiteEvent from "./event";
 
-export var PageVisible : LiteEvent<HTMLElement>;
-export var PageHidden : LiteEvent<HTMLElement>;
+export var PageVisible: LiteEvent<HTMLElement>;
+export var PageHidden: LiteEvent<HTMLElement>;
 
 export function setupNavigation() {
     PageVisible = new LiteEvent<HTMLElement>();
     PageHidden = new LiteEvent<HTMLElement>();
 
-    var toolbar = document.createElement("div");
+    document.body.insertAdjacentHTML("afterbegin", "<div id='pages-carousel'></div>");
+    const carousel = document.getElementById("pages-carousel");
+    const pages = document.getElementsByClassName("bloom-page");
+    for (let index = 0; index < pages.length; index++) {
+        carousel.appendChild(pages[index]);
+    }
+
+    const toolbar = document.createElement("div");
     document.body.appendChild(toolbar);
     toolbar.outerHTML = "<div id='playerToolbar'>Home</div>";
 
@@ -17,7 +24,7 @@ export function setupNavigation() {
         [].forEach.call(document.body.querySelectorAll(".bloom-page"), function(page){
             page.classList.remove("currentPage");
         });
-       showFirstPage();
+        showFirstPage();
     };
 
     document.body.onclick = handleClick;
@@ -26,25 +33,38 @@ export function setupNavigation() {
 }
 
 function showFirstPage() {
-    document.body.getElementsByClassName("bloom-page")[0].classList.add("currentPage");
+    const firstPage = document.body.getElementsByClassName("bloom-page")[0] as HTMLElement;
+    firstPage.classList.add("currentPage");
+    document.getElementById("pages-carousel").style.left = "0px";
+    PageVisible.raise(firstPage);
 }
 
-function handleClick(event:Event):void {
+function handleClick(event: Event): void {
     gotoNextPage();
 }
 
-export function gotoNextPage():void {
-    var current = document.body.getElementsByClassName("currentPage")[0] as HTMLElement;
-    if(current) {
-        //hide the current page
-        current.classList.remove("currentPage");
-        PageHidden.raise(current);
+export function gotoNextPage(): void {
+    const carousel = document.getElementById("pages-carousel");
+    const visiblePages = carousel.getElementsByClassName("currentPage");
+    const current = visiblePages[visiblePages.length - 1] as HTMLElement;
+    if (current) {
+        let left: number = (parseInt(carousel.style.left, 10) || 0);
+        left = left - current.scrollWidth;
+
+        carousel.setAttribute("style", "left:" + left + "px");
 
         //find the next one
-        var next = current.nextElementSibling as HTMLElement;
-        if(next) {
+        const next = current.nextElementSibling as HTMLElement;
+        PageHidden.raise(current);
+
+        if (next) {
             next.classList.add("currentPage");
-            PageVisible.raise(next);
+            //hide the current page after it has slid off the screen
+            current.addEventListener("transitionend", () => {
+                current.classList.remove("currentPage");
+                carousel.setAttribute("style", "left: 0px");
+                PageVisible.raise(next);
+            }, true);
         } else {
             // wrap around (review)
             showFirstPage();

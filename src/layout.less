@@ -1,11 +1,18 @@
-.bloom-page{
-    display: none !important;
+#pages-carousel{
+     display: flex;
+     flex-direction: row;
+     left:0;
 }
+
+.bloom-page{
+   display: none !important;
+}
+
 body{
      transform-origin: left top;
 }
 .bloom-page.currentPage{
-    display: block;// !important;
+    display: block !important;
 }
 .bloom-page::after{
     content:'';

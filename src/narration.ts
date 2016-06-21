@@ -1,3 +1,4 @@
+/* tslint:disable: no-unused-variable */
 import {PageVisible, PageHidden, gotoNextPage} from "./navigation";
 
 export function SetupNarration() : void{

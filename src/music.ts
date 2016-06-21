@@ -1,6 +1,6 @@
 import {PageVisible, PageHidden} from "./navigation";
 
-export function SetupMusic() : void {
+export function SetupMusic(): void {
     PageVisible.subscribe(page => {
         //TODO
     });
