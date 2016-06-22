@@ -43,13 +43,13 @@ export default class Navigation {
         this.addOverlayButton("nextButton", () => this.gotoNextPage());
         this.addOverlayButton("previousButton", () => this.gotoPreviousPage());
     }
-    
+
     public setupAutoNavigation(): void {
         PageNarrationComplete.subscribe(page => {
             if (page === this.currentPage()) {
                 this.gotoNextPage();
             }
-        });       
+        });
     }
 
     public showFirstPage() {
