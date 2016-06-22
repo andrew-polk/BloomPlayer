@@ -8,12 +8,12 @@ function attach() {
     const nav = new Navigation(); // first: sets up events others hook
     nav.setupNavigation();
 
-    SetupNarration(); // before animation, sets up event it hooks
-    nav.setupAutoNavigation(); // after narration, uses narration event
+    nav.showFirstPage(); // get things visible
+    SetupLayout(); // first page must be visible before we can determine the scale needed
     SetupAnimation();
     SetupMusic();
-    nav.showFirstPage(); // this should be after animation and music are ready to receive events
-    SetupLayout(); // first page must be visible before we can determine the scale needed
+    SetupNarration();
+    nav.showFirstPage(); // now go to first page again so that all the fancy stuff gets triggered
 }
 
 document.addEventListener("DOMContentLoaded", attach, false);
