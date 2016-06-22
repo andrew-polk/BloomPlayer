@@ -7,11 +7,12 @@ import {SetupNarration} from "./narration";
 function attach() {
     const nav = new Navigation(); // first: sets up events others hook
     nav.setupNavigation();
-    SetupLayout();
+
     SetupAnimation();
     SetupMusic();
     SetupNarration();
-    nav.showFirstPage(); // last: triggers event others want
+    nav.showFirstPage(); // this should be after animation and music are ready to receive events
+    SetupLayout(); // first page must be visible before we can determine the scale needed
 }
 
 document.addEventListener("DOMContentLoaded", attach, false);
