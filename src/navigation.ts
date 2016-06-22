@@ -1,5 +1,6 @@
 import "./navigation.less";
 import LiteEvent from "./event";
+import {PageNarrationComplete} from "./narration";
 
 export var PageVisible: LiteEvent<HTMLElement>;
 export var PageBeforeVisible: LiteEvent<HTMLElement>;
@@ -41,6 +42,14 @@ export default class Navigation {
         this.addOverlayButton("homeButton", () => this.showFirstPage());
         this.addOverlayButton("nextButton", () => this.gotoNextPage());
         this.addOverlayButton("previousButton", () => this.gotoPreviousPage());
+    }
+    
+    public setupAutoNavigation(): void {
+        PageNarrationComplete.subscribe(page => {
+            if (page === this.currentPage()) {
+                this.gotoNextPage();
+            }
+        });       
     }
 
     public showFirstPage() {

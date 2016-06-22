@@ -9,6 +9,7 @@ function attach() {
     nav.setupNavigation();
 
     SetupNarration(); // before animation, sets up event it hooks
+    nav.setupAutoNavigation(); // after narration, uses narration event
     SetupAnimation();
     SetupMusic();
     nav.showFirstPage(); // this should be after animation and music are ready to receive events

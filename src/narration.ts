@@ -3,6 +3,7 @@ import LiteEvent from "./event";
 
 export function SetupNarration(): void {
     PageDurationAvailable = new LiteEvent<HTMLElement>();
+    PageNarrationComplete = new LiteEvent<HTMLElement>();
     PageVisible.subscribe(page => {
         Narration.listen(page);
     });
@@ -16,6 +17,7 @@ export function SetupNarration(): void {
 
 export var PageDuration: number;
 export var PageDurationAvailable: LiteEvent<HTMLElement>;
+export var PageNarrationComplete: LiteEvent<HTMLElement>;
 
 // Todo: to highlight current sentence, define properties for class ui-audioCurrent
 
@@ -49,6 +51,10 @@ class Narration {
         if (segments.length === 0) {
             PageDuration = 2.0;
             PageDurationAvailable.raise(page);
+            setTimeout(function() {
+                // Arbitrarily raise the event after this delay, so things move on.
+                PageNarrationComplete.raise(page);
+            }, PageDuration * 1000);
             return;
         }
         const outerThis = this;
@@ -132,6 +138,7 @@ class Narration {
              document.body.appendChild(player);
              // if we just pass the function, it has the wrong "this"
              player.addEventListener("ended", () => this.playEnded());
+             player.addEventListener("error", () => this.playEnded());
          }
          return <HTMLMediaElement> player;
     }
@@ -179,6 +186,7 @@ class Narration {
                 return;
             }
             this.playingAll = false;
+            PageNarrationComplete.raise(this.playerPage);
             //this.changeStateAndSetExpected("listen");
             return;
         }
