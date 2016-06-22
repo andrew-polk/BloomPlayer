@@ -2,6 +2,7 @@ import "./navigation.less";
 import LiteEvent from "./event";
 
 export var PageVisible: LiteEvent<HTMLElement>;
+export var PageBeforeVisible: LiteEvent<HTMLElement>;
 export var PageHidden: LiteEvent<HTMLElement>;
 
 export default class Navigation {
@@ -9,6 +10,7 @@ export default class Navigation {
 
     public setupNavigation() {
         PageVisible = new LiteEvent<HTMLElement>();
+        PageBeforeVisible = new LiteEvent<HTMLElement>();
         PageHidden = new LiteEvent<HTMLElement>();
 
         document.body.insertAdjacentHTML("afterbegin", "<div id='navigation'></div>");
@@ -28,7 +30,6 @@ export default class Navigation {
                         if (current) {
                             PageVisible.raise(current);
                         }
-                        //PageVisible.raise(next);
                         console.log("endtrans");
                     }, true);
 
@@ -40,7 +41,19 @@ export default class Navigation {
         this.addOverlayButton("homeButton", () => this.showFirstPage());
         this.addOverlayButton("nextButton", () => this.gotoNextPage());
         this.addOverlayButton("previousButton", () => this.gotoPreviousPage());
-        this.showFirstPage();
+    }
+
+    public showFirstPage() {
+        [].forEach.call(document.body.querySelectorAll(".bloom-page"), function(page){
+                page.classList.remove("currentPage");
+            });
+
+        this.firstPage().classList.add("currentPage");
+        this.carousel().style.left = "0px";
+        // No animation of showing first page, but seems safest to
+        // raise this event anyway.
+        PageBeforeVisible.raise(this.firstPage());
+        PageVisible.raise(this.firstPage());
     }
 
     private addOverlayButton(id: string, clickHandler: (evt: MouseEvent) => void) {
@@ -51,16 +64,6 @@ export default class Navigation {
             event.stopPropagation();
             clickHandler(event);
         };
-    }
-
-    private showFirstPage() {
-        [].forEach.call(document.body.querySelectorAll(".bloom-page"), function(page){
-                page.classList.remove("currentPage");
-            });
-
-        this.firstPage().classList.add("currentPage");
-        this.carousel().style.left = "0px";
-        PageVisible.raise(this.firstPage());
     }
 
     private carousel(): HTMLElement {
@@ -106,7 +109,7 @@ export default class Navigation {
         //find the next one
         if (targetPage) {
             targetPage.classList.add("currentPage");
-            //PageVisible.raise(targetPage);
+            PageBeforeVisible.raise(targetPage); // before the animation
         } else {
             // wrap around //TODO remove this when we can disable the "next button" on the last page
             this.showFirstPage();
