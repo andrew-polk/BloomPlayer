@@ -24,6 +24,10 @@ export default class Navigation {
                         carousel.style.left = "0px";
                         //carousel.style.right = "unset";
 
+                        const current = this.currentPage();
+                        if (current) {
+                            PageVisible.raise(current);
+                        }
                         //PageVisible.raise(next);
                         console.log("endtrans");
                     }, true);
@@ -102,7 +106,7 @@ export default class Navigation {
         //find the next one
         if (targetPage) {
             targetPage.classList.add("currentPage");
-            PageVisible.raise(targetPage);
+            //PageVisible.raise(targetPage);
         } else {
             // wrap around //TODO remove this when we can disable the "next button" on the last page
             this.showFirstPage();

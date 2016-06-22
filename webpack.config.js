@@ -22,7 +22,7 @@ module.exports = {
            { test: /\.ts(x?)$/, loader: 'ts-loader' },
            { test: /\.less$/, loaders: ['style-loader', 'css-loader', 'less-loader'] },
            //{ test: /\.(svg|png)$/, loader: 'file',  include: path.join(__dirname, "./assets")}
-            { test: /\.(svg|png)$/, loader: 'url',  include: path.join(__dirname, "./assets")}
+            { test: /\.(svg|png)$/, loader: 'url-loader',  include: path.join(__dirname, "./assets")}
         ],
     }
 };

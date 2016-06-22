@@ -5,11 +5,13 @@ import {SetupMusic} from "./music";
 import {SetupNarration} from "./narration";
 
 function attach() {
-    new Navigation().setupNavigation();
+    const nav = new Navigation(); // first: sets up events others hook
+    nav.setupNavigation();
     SetupLayout();
     SetupAnimation();
     SetupMusic();
     SetupNarration();
+    nav.showFirstPage(); // last: triggers event others want
 }
 
 document.addEventListener("DOMContentLoaded", attach, false);
