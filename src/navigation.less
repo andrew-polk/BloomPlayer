@@ -24,25 +24,30 @@ html,body{
 }
 #homeButton{
     background-image: url('../assets/home.svg');
-    height: 26px;
-    width: 26px;
     position: absolute;
     top: 0;
     left: 0;
-
+    background-size: contain;
+    //NB: Chrome & FF handle this image scaling differently
+    height: 10em;
+    width: 10em;
 }
+@pageTurningButtonWidth: 20em;
+@pageTurningButtonHeight: 30em;
 #nextButton{
     background-image: url('../assets/next.svg');
-    height: 26px;
-    width: 26px;
+    background-size: cover;
+    height: @pageTurningButtonHeight;
+    width: @pageTurningButtonWidth;
     position: absolute;
     top: 50%;
     right: 20px;
 }
 #previousButton{
     background-image: url('../assets/previous.svg');
-    height: 26px;
-    width: 26px;
+    background-size: cover;
+    height: @pageTurningButtonHeight;
+    width: @pageTurningButtonWidth;
     position: absolute;
     top: 50%;
     left: 0;
@@ -51,8 +56,11 @@ html,body{
 .overlay{
     z-index: 10000;
     //display: none;
+    opacity: 0;
+    transition: all 1s;
 }
 
 body:hover .overlay{
     display: block !important;
+    opacity: .7;
 }

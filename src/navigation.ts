@@ -96,10 +96,13 @@ export default class Navigation {
         // the 'left' (to go forward) or 'right' (to go backward)).
         this.carousel().style.transition = "left 0.5s ease 0s, right 0.5s ease 0s";
 
+        const scalingFactor = parseFloat(this.carousel().style.transform.replace("scale(", ""));
+
+        const amount = Math.round(this.pageWidth() * scalingFactor);
         if (goForward) {
-            this.carousel().style.left = (-1 * this.pageWidth()) + "px";
+            this.carousel().style.left = (-1 * amount) + "px";
         } else {
-            this.carousel().style.right =  this.pageWidth() + "px";
+            this.carousel().style.right =  amount + "px";
         }
 
         this.pageBeingHidden = current;
