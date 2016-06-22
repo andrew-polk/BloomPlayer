@@ -1,14 +1,18 @@
 import {PageVisible, PageBeforeVisible, PageHidden} from "./navigation";
+import {PageDuration, PageDurationAvailable} from "./narration";
 
 export function SetupAnimation(): void {
     PageVisible.subscribe(page => {
-        Animation.setupAnimation(page, false);
+        Animation.pageVisible(page);
     });
     PageBeforeVisible.subscribe(page => {
         Animation.setupAnimation(page, true);
     });
     PageHidden.subscribe(page => {
         // Anything to do here?
+    });
+    PageDurationAvailable.subscribe(page => {
+        Animation.durationAvailable(page);
     });
 }
 
@@ -68,10 +72,33 @@ class Animation {
             //Insert the css for the imageView div that utilizes the newly created animation
             (<CSSStyleSheet> stylesheet).insertRule(".bloom-animate { transform-origin: 0px 0px; transform: "
                 + initialTransform
-                + "; animation-name: movepic; animation-duration: 2500ms; animation-fill-mode: forwards; }", 1);
+                + "; animation-name: movepic; animation-duration: "
+                + PageDuration + "s; animation-fill-mode: forwards; }", 1);
         }
         this.addClass(animationView, "bloom-animate"); // add the class that triggers the animation
     }
+
+    // We cannot be absolutely sure whether the page transition or collecting the audio lengths will
+    // take longer. So we listen for both events and start the animation when we have both have
+    // occurred.
+    public static durationAvailable(page: HTMLElement) {
+        this.lastDurationPage = page;
+        if (this.currentPage === this.lastDurationPage) {
+            // already got the corresponding pageVisible event
+            this.setupAnimation(page, false);
+        }
+    }
+
+    public static pageVisible(page: HTMLElement) {
+        this.currentPage = page;
+        if (this.currentPage === this.lastDurationPage) {
+            // already got the corresponding durationAvailable event
+            this.setupAnimation(page, false);
+        }
+    }
+
+    private static currentPage: HTMLElement;
+    private static lastDurationPage: HTMLElement;
 
     private static addClass(elt: HTMLElement, className: string) {
         const index = elt.className.indexOf(className);

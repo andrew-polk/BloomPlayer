@@ -1,13 +1,21 @@
-import {PageVisible, PageHidden} from "./navigation";
+import {PageVisible, PageBeforeVisible, PageHidden} from "./navigation";
+import LiteEvent from "./event";
 
 export function SetupNarration(): void {
+    PageDurationAvailable = new LiteEvent<HTMLElement>();
     PageVisible.subscribe(page => {
         Narration.listen(page);
     });
     PageHidden.subscribe(page => {
         // Todo: stop playing?
     });
+    PageBeforeVisible.subscribe(page => {
+        Narration.computeDuration(page);
+    });
 }
+
+export var PageDuration: number;
+export var PageDurationAvailable: LiteEvent<HTMLElement>;
 
 // Todo: to highlight current sentence, define properties for class ui-audioCurrent
 
@@ -30,6 +38,43 @@ class Narration {
         this.playingAll = true;
         this.setStatus("listen", Status.Active);
         this.playCurrentInternal();
+    }
+
+    public static computeDuration(page: HTMLElement): void {
+        const durationPlayer = this.getAudio("bloom-duration");
+        this.playerPage = page;
+        const segments = this.getAudioElements();
+        let duration = 0.0;
+        let index = 0;
+        if (segments.length === 0) {
+            PageDuration = 2.0;
+            PageDurationAvailable.raise(page);
+            return;
+        }
+        const outerThis = this;
+
+        function getNextSegment() {
+            index++;
+            if (index < segments.length) {
+                durationPlayer.setAttribute("src", outerThis.currentAudioUrl(segments[index].getAttribute("id")));
+            } else {
+                if (duration < 1.0) {
+                    duration = 1.0; // maybe too small?
+                }
+                PageDuration = duration;
+                PageDurationAvailable.raise(page);
+            }
+        }
+
+        durationPlayer.addEventListener("durationchange", () => {
+            duration += durationPlayer.duration;
+            getNextSegment();
+        });
+        durationPlayer.addEventListener("error", () => {
+            getNextSegment(); // can't get a length for this segment, move on.
+        });
+        // trigger first duration evaluation.
+        durationPlayer.setAttribute("src", this.currentAudioUrl(segments[0].getAttribute("id")));
     }
 
     private static playerPage: HTMLElement;
@@ -76,10 +121,14 @@ class Narration {
     }
 
     private static getPlayer(): HTMLMediaElement {
-         let player  = document.querySelector("#player");
+        return this.getAudio("player");
+    }
+
+    private static getAudio(id: string) {
+         let player  = document.querySelector("#" + id);
          if (!player) {
              player = document.createElement("audio");
-             player.setAttribute("id", "player");
+             player.setAttribute("id", id);
              document.body.appendChild(player);
              // if we just pass the function, it has the wrong "this"
              player.addEventListener("ended", () => this.playEnded());
