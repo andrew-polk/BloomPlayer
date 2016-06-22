@@ -59,7 +59,7 @@ class Animation {
             // in case we want to have another go at getting the initial state right while visible.)
             // (<CSSStyleSheet> stylesheet).insertRule(".bloom-animate { transform-origin: 0px 0px; transform: "
             //     + initialTransform + ";}", 0);
-            (<CSSStyleSheet> stylesheet).insertRule(".bloom-animate {visibility: hidden;}",0);
+            (<CSSStyleSheet> stylesheet).insertRule(".bloom-animate {visibility: hidden;}", 0);
         } else {
             //Insert the keyframe animation rule with the dynamic begin and end set
             (<CSSStyleSheet> stylesheet).insertRule("@keyframes movepic { from{ transform-origin: 0px 0px; transform: "
