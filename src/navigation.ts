@@ -102,6 +102,7 @@ export default class Navigation {
         //find the next one
         if (targetPage) {
             targetPage.classList.add("currentPage");
+            PageVisible.raise(targetPage);
         } else {
             // wrap around //TODO remove this when we can disable the "next button" on the last page
             this.showFirstPage();
