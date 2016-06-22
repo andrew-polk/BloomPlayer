@@ -1,9 +1,58 @@
-#playerToolbar{
-    position: fixed;
+html,body{
+    height:100%;
+    width:100%;
+}
+
+#navigation{
+    width: 100vw;
+    height: 100vh;
+    //border: solid orange;
+    box-sizing: border-box;
+}
+
+#pages-carousel{
+
+     transform-origin: left top;
+    //  width: -webkit-fit-content;
+    //  width: -moz-fit-content;
+    //  height: -webkit-fit-content;
+    //  height: -moz-fit-content;
+
+}
+.bloom-page{
+   display: none !important;
+}
+#homeButton{
+    background-image: url('../assets/home.svg');
+    height: 26px;
+    width: 26px;
+    position: absolute;
     top: 0;
-    /*height: 50px;*/
-    background-color: #363333;
-    width: 100%;
-    color: white;
-    padding: 10px;
+    left: 0;
+
+}
+#nextButton{
+    background-image: url('../assets/next.svg');
+    height: 26px;
+    width: 26px;
+    position: absolute;
+    top: 50%;
+    right: 20px;
+}
+#previousButton{
+    background-image: url('../assets/previous.svg');
+    height: 26px;
+    width: 26px;
+    position: absolute;
+    top: 50%;
+    left: 0;
+
+}
+.overlay{
+    z-index: 10000;
+    //display: none;
+}
+
+body:hover .overlay{
+    display: block !important;
 }
