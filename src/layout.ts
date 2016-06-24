@@ -3,11 +3,17 @@ import "./layout.less";
 export function SetupLayout() {
     setOrientation();
     adjust();
-    window.addEventListener("resize", () => adjust(), false);
+    window.addEventListener("resize", () => window.setTimeout( adjust, 500));
+    window.addEventListener("orientationchange", () => window.setTimeout( adjust, 500));
     window.addEventListener("orientationchange", setOrientation);
 }
 
 function adjust() {
+    console.log("adjusting");
+
+    //Enhance: would using meta.viewport be better?
+    //http://stackoverflow.com/questions/8735457/scale-fit-mobile-web-content-using-viewport-meta-tag?rq=1
+
     const pageWidth = document.getElementById("pages-carousel").querySelectorAll(".bloom-page")[0].scrollWidth;
     const pageHeight = document.getElementById("pages-carousel").querySelectorAll(".bloom-page")[0].scrollHeight;
 
@@ -20,6 +26,7 @@ function adjust() {
 }
 
 function setOrientation() {
+      console.log("changing orientation");
      const carousel = document.getElementById("pages-carousel");
      const pages = carousel.getElementsByClassName("bloom-page");
      for (let index = 0; index < pages.length; index++) {
