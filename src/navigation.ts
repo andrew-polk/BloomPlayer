@@ -14,6 +14,12 @@ export default class Navigation {
         PageBeforeVisible = new LiteEvent<HTMLElement>();
         PageHidden = new LiteEvent<HTMLElement>();
 
+        PageNarrationComplete.subscribe(page => {
+            if (page === this.currentPage()) {
+                this.gotoNextPage();
+            }
+        });
+        
         document.body.insertAdjacentHTML("afterbegin", "<div id='navigation'></div>");
         const navigation = document.getElementById("navigation");
 
@@ -42,14 +48,6 @@ export default class Navigation {
         this.addOverlayButton("homeButton", () => this.showFirstPage());
         this.addOverlayButton("nextButton", () => this.gotoNextPage());
         this.addOverlayButton("previousButton", () => this.gotoPreviousPage());
-    }
-
-    public setupAutoNavigation(): void {
-        PageNarrationComplete.subscribe(page => {
-            if (page === this.currentPage()) {
-                this.gotoNextPage();
-            }
-        });
     }
 
     public showFirstPage() {

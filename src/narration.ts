@@ -2,8 +2,6 @@ import {PageVisible, PageBeforeVisible, PageHidden} from "./navigation";
 import LiteEvent from "./event";
 
 export function SetupNarration(): void {
-    PageDurationAvailable = new LiteEvent<HTMLElement>();
-    PageNarrationComplete = new LiteEvent<HTMLElement>();
     PageVisible.subscribe(page => {
         Narration.listen(page);
     });
@@ -13,6 +11,13 @@ export function SetupNarration(): void {
     PageBeforeVisible.subscribe(page => {
         Narration.computeDuration(page);
     });
+}
+
+// This can (and should) be called very early in the setup process, before any of the setup calls that use
+// these events.
+export function SetupNarrationEvents(): void {
+    PageDurationAvailable = new LiteEvent<HTMLElement>();
+    PageNarrationComplete = new LiteEvent<HTMLElement>();    
 }
 
 export var PageDuration: number;
