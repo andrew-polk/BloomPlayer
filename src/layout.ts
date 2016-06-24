@@ -8,27 +8,33 @@ export function SetupLayout() {
     window.addEventListener("orientationchange", setOrientation);
 }
 
-function adjust() {
-    console.log("adjusting");
-
+export function Scale(): number {
     //Enhance: would using meta.viewport be better?
     //http://stackoverflow.com/questions/8735457/scale-fit-mobile-web-content-using-viewport-meta-tag?rq=1
 
-    const pageWidth = document.getElementById("pages-carousel").querySelectorAll(".bloom-page")[0].scrollWidth;
-    const pageHeight = document.getElementById("pages-carousel").querySelectorAll(".bloom-page")[0].scrollHeight;
-
+    const pageWidth = document.querySelectorAll(".currentPage")[0].scrollWidth;
+    const pageHeight = document.querySelectorAll(".currentPage")[0].scrollHeight;
+    if (!pageWidth) {
+        debugger;
+    }
     //TODO: I suspect this equation is off, or rounding the wrong way, or not taking
     //consideration of scroll bar, or border of the navigation or carousel containers, something.
     //this 15 is a temporary fudge, roughly the scrollbar width
-    const scale = Math.min((window.innerWidth ) / pageWidth, (window.innerHeight ) / pageHeight);
+    return Math.min((window.innerWidth ) / pageWidth, (window.innerHeight ) / pageHeight);
+}
+
+function adjust() {
+    console.log("adjusting");
+
     const carousel = document.getElementById("pages-carousel");
-    carousel.style.transform = "scale(" + scale + ")";
+    if (carousel) {
+        carousel.style.transform = "scale(" + Scale() + ")";
+    }
 }
 
 function setOrientation() {
-      console.log("changing orientation");
-     const carousel = document.getElementById("pages-carousel");
-     const pages = carousel.getElementsByClassName("bloom-page");
+     console.log("changing orientation");
+     const pages = document.querySelectorAll(".bloom-page");
      for (let index = 0; index < pages.length; index++) {
          const page = pages[index];
 

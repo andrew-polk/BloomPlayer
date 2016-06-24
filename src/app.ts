@@ -1,20 +1,29 @@
-import Navigation from "./navigation";
+import {Navigation} from "./navigation";
 import {SetupLayout} from "./layout";
 import {SetupAnimation} from "./animation";
 import {SetupMusic} from "./music";
-import {SetupNarration, SetupNarrationEvents} from "./narration";
+import {SetupNarration, SetupNarrationEvents, PageNarrationComplete} from "./narration";
+import {GoNextPage} from "./carousel";
 
 function attach() {
-    SetupNarrationEvents();  // very early, defines events others subscribe to.
+
+    SetupLayout();
+
     const nav = new Navigation(); // first: sets up events others hook
     nav.setupNavigation();
 
-    nav.showFirstPage(); // get things visible
-    SetupLayout(); // first page must be visible before we can determine the scale needed
+    SetupNarrationEvents();  // very early, defines events others subscribe to.
     SetupAnimation();
     SetupMusic();
     SetupNarration();
-    nav.showFirstPage(); // now go to first page again so that all the fancy stuff gets triggered
+    nav.GotoFirstPage(); // now go to first page again so that all the fancy stuff gets triggered
+
+    //commented out because we are getting these events even if there is no narration.
+    // PageNarrationComplete.subscribe(page => {
+    //     if (page === nav.currentPage()) {
+    //          GoNextPage.raise();
+    //     }
+    // });
 }
 
 document.addEventListener("DOMContentLoaded", attach, false);

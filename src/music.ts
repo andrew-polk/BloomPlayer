@@ -1,4 +1,4 @@
-import {PageVisible, PageHidden} from "./navigation";
+import {PageVisible, PageHidden} from "./carousel";
 
 export function SetupMusic(): void {
     PageVisible.subscribe(page => {

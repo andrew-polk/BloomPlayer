@@ -1,4 +1,4 @@
-import {PageVisible, PageBeforeVisible, PageHidden} from "./navigation";
+import {PageVisible, PageBeforeVisible, PageHidden} from "./carousel";
 import LiteEvent from "./event";
 
 export function SetupNarration(): void {
@@ -17,7 +17,7 @@ export function SetupNarration(): void {
 // these events.
 export function SetupNarrationEvents(): void {
     PageDurationAvailable = new LiteEvent<HTMLElement>();
-    PageNarrationComplete = new LiteEvent<HTMLElement>();    
+    PageNarrationComplete = new LiteEvent<HTMLElement>();
 }
 
 export var PageDuration: number;

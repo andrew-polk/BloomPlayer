@@ -1,4 +1,4 @@
-import {PageVisible, PageBeforeVisible, PageHidden} from "./navigation";
+import {PageVisible, PageBeforeVisible, PageHidden} from "./carousel";
 import {PageDuration, PageDurationAvailable} from "./narration";
 
 export function SetupAnimation(): void {
