@@ -6,8 +6,8 @@ html,body{
 #navigation{
     width: 100vw;
     height: 100vh;
-    //border: solid orange;
     box-sizing: border-box;
+    border: solid 1px orange;
 }
 
 #pages-carousel{
@@ -17,7 +17,6 @@ html,body{
     //  width: -moz-fit-content;
     //  height: -webkit-fit-content;
     //  height: -moz-fit-content;
-
 }
 .bloom-page{
    display: none !important;
@@ -29,35 +28,36 @@ html,body{
     left: 0;
     background-size: contain;
     //NB: Chrome & FF handle this image scaling differently
+    // height: 10em;
+    // width: 10em;
     height: 10em;
     width: 10em;
 }
-@pageTurningButtonWidth: 20em;
-@pageTurningButtonHeight: 30em;
+@pageTurningButtonWidth: 9em;
+@pageTurningButtonHeight: 15em;
 #nextButton{
     background-image: url('../assets/next.svg');
-    background-size: cover;
-    height: @pageTurningButtonHeight;
-    width: @pageTurningButtonWidth;
-    position: absolute;
-    top: 50%;
-    right: 20px;
+    right: 2px;
 }
 #previousButton{
     background-image: url('../assets/previous.svg');
+    left: 2;
+}
+#previousButton, #nextButton {
     background-size: cover;
     height: @pageTurningButtonHeight;
     width: @pageTurningButtonWidth;
     position: absolute;
-    top: 50%;
-    left: 0;
-
+    top: 50% - (@pageTurningButtonHeight);
 }
+
 .overlay{
     z-index: 10000;
+    background-repeat: no-repeat;
     //display: none;
-    opacity: 0;
+    opacity: .7;
     transition: all 1s;
+    //border: solid red;
 }
 
 body:hover .overlay{
