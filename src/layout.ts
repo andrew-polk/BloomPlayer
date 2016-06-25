@@ -1,7 +1,11 @@
 import "./layout.less";
 
 export function SetupLayout() {
+    //tell smart phone that we are taking care of zooming to fit them
+    document.head.insertAdjacentHTML("afterBegin",
+        "<meta name='viewport' content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no'>");
     setOrientation();
+
     adjust();
     window.addEventListener("resize", () => window.setTimeout( adjust, 500));
     window.addEventListener("orientationchange", () => window.setTimeout( adjust, 500));

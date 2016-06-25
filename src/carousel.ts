@@ -1,6 +1,5 @@
 import "./navigation.less";
 import LiteEvent from "./event";
-import {Scale} from "./layout";
 
 export var PageVisible: LiteEvent<HTMLElement>;
 export var PageBeforeVisible: LiteEvent<HTMLElement>;
@@ -119,7 +118,7 @@ export class Carousel {
                         if (current) {
                             PageVisible.raise(current);
                         }
-        }, 1000);
+        }, 500);
     }
 }
 

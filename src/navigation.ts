@@ -31,7 +31,7 @@ export  class Navigation {
         const scalerElement = document.getElementById("scaler");
   //      console.log(Scale());
 
-        window.setTimeout( ()=> scalerElement.style.transform =  "scale(" + Scale() + ")");
+        window.setTimeout( () => scalerElement.style.transform =  "scale(" + Scale() + ")");
 //        console.log(scalerElement.style.transform);
         this.carousel = new Carousel(scalerElement);
 
