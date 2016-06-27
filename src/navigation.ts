@@ -36,8 +36,11 @@ export  class Navigation {
         this.carousel = new Carousel(scalerElement);
 
         this.addOverlayButton("homeButton", () => this.carousel.showFirstPage());
+        this.addOverlayButton("musicButton", () => alert("coming soon"));
+        this.addOverlayButton("narrationButton", () => alert("coming soon"));
         this.addOverlayButton("nextButton", () => this.carousel.gotoNextPage());
         this.addOverlayButton("previousButton", () => this.carousel.gotoPreviousPage());
+        this.addOverlayButton("playAndPauseButton", () => alert("coming soon"));
     }
 
     public GotoFirstPage() {
