@@ -46,7 +46,7 @@ class Narration {
         this.setStatus("listen", Status.Active);
         this.playCurrentInternal();
     }
-    
+
     public static computeDuration(page: HTMLElement): void {
 
         this.playerPage = page;
@@ -62,7 +62,6 @@ class Narration {
             }, PageDuration * 1000);
             return;
         }
-        const outerThis = this;
         // trigger first duration evaluation.
         this.getDurationPlayer().setAttribute("src", this.currentAudioUrl(this.segments[0].getAttribute("id")));
     }
@@ -73,7 +72,7 @@ class Narration {
     private static segments: HTMLElement[];
     private static segmentIndex: number;
     private static pageDuration: number;
-    
+
     private static getDurationPlayer(): HTMLMediaElement {
         return this.getAudio("bloom-duration", (audio) => {
             audio.addEventListener("durationchange", (ev) => {
@@ -85,11 +84,12 @@ class Narration {
             });
         });
     }
-    
+
     private static getNextSegment() {
         this.segmentIndex++;
         if (this.segmentIndex < this.segments.length) {
-            this.getDurationPlayer().setAttribute("src", this.currentAudioUrl(this.segments[this.segmentIndex].getAttribute("id")));
+            this.getDurationPlayer().setAttribute("src",
+                this.currentAudioUrl(this.segments[this.segmentIndex].getAttribute("id")));
         } else {
             if (this.pageDuration < 1.0) {
                 this.pageDuration = 1.0; // maybe too small?
@@ -142,7 +142,7 @@ class Narration {
         return this.getAudio("player", (audio) => {
               // if we just pass the function, it has the wrong "this"
              audio.addEventListener("ended", () => this.playEnded());
-             audio.addEventListener("error", () => this.playEnded());           
+             audio.addEventListener("error", () => this.playEnded());
         });
     }
 
