@@ -25,13 +25,14 @@ class Animation {
         const animationView = <HTMLElement> ([].slice.call(page.getElementsByClassName("bloom-imageContainer"))
             .find(v => (<IAnimation> v.dataset).initialrect));
         if (!animationView) {return; } // no image to animate
+        this.removeClass(animationView, "bloom-animate"); // make sure the animation isn't triggered until we set it up.
         const stylesheet = this.getAnimationStylesheet().sheet;
         const initialRectStr = (<IAnimation> <any> animationView.dataset).initialrect;
 
         //Fetch the data from the dataset and reformat into scale width and height along with offset x and y
         const initialRect = initialRectStr.split(" ");
-        const viewWidth = animationView.getBoundingClientRect().width;
-        const viewHeight = animationView.getBoundingClientRect().height;
+        const viewWidth = animationView.clientWidth; // getBoundingClientRect().width;
+        const viewHeight = animationView.clientHeight; // getBoundingClientRect().height;
         const initialScaleWidth = 1 / parseFloat(initialRect[2]);
         const initialScaleHeight = 1 / parseFloat(initialRect[3]);
         const finalRect = (<IAnimation> <any> animationView.dataset).finalrect.split(" ");
@@ -51,19 +52,61 @@ class Animation {
 
         console.log(initialTransform);
         console.log(finalTransform);
-        while ((<CSSStyleSheet> stylesheet).cssRules.length > 1) {
+        while ((<CSSStyleSheet> stylesheet).cssRules.length > 2) {
             // remove rules from some previous picture
             (<CSSStyleSheet> stylesheet).removeRule(0);
         }
 
+        // We expect to see something like this:
+        // <div class="bloom-imageContainer bloom-backgroundImage bloom-leadingElement"
+        // style="background-image:url('1.jpg')"
+        // title="..."
+        // data-initialrect="0.3615 0.0977 0.6120 0.6149" data-finalrect="0.0000 0.0800 0.7495 0.7526"
+        // data-duration="5" />
+        // ...
+        // </div>
+        //
+        // We want to make something like this:
+        // <div ...with all the original properties minus the background-image style>
+        //      <div class="bloom-ui-animationWrapper" style = "width: 400px; height; 100%">
+        //          <div class="bloom-animate" style="background-image:url('1.jpg'); width: 400px; height; 300px"/>
+        //              ...original content...
+        //          </div>
+        //      </div>
+        // </div>
+        const wrapperClassName = "bloom-ui-animationWrapper";
+        if (!this.hasClass(animationView, wrapperClassName)) {
+            const wrapDiv = document.createElement("div");
+            animationView.appendChild(wrapDiv);
+            this.addClass(wrapDiv, wrapperClassName);
+            const movingDiv = document.createElement("div");
+            wrapDiv.appendChild(movingDiv);
+            const imageAspectRatio = 4 / 3; // Enhance: get from image
+            const viewAspectRatio = viewWidth / viewHeight;
+            if (imageAspectRatio < viewAspectRatio) {
+                // black bars on side
+                const imageWidth = viewHeight * imageAspectRatio;
+                wrapDiv.setAttribute("style", "height: 100%; width: " + imageWidth
+                    + "px; left: " + (viewWidth - imageWidth) / 2  + "px");
+            } // todo: else: black bars top and bottom
+            // Todo: if the original div had content (typically an <img>), move it
+            let styleData = animationView.getAttribute("style");
+            if (styleData) {
+                // This somewhat assumes the ONLY style attribute is the background image.
+                // I think we can improve that when and if it becomes an issue.
+
+                animationView.setAttribute("style", "");
+                movingDiv.setAttribute("style", styleData);
+            }
+            movingDiv.setAttribute("class", "bloom-animate");
+        }
+
         if (beforeVisible) {
-            // this rule should put it in the initial state. But the element's own width is different
-            // in this pre-visible state so results are unpredictable. Better just hide it until things are right.
-            // (Just making things invisible could be done with rather less calculation. Leaving it this way
-            // in case we want to have another go at getting the initial state right while visible.)
-            // (<CSSStyleSheet> stylesheet).insertRule(".bloom-animate { transform-origin: 0px 0px; transform: "
-            //     + initialTransform + ";}", 0);
-            (<CSSStyleSheet> stylesheet).insertRule(".bloom-animate {visibility: hidden;}", 0);
+            // this rule puts it in the initial state for the animation, so we get a smooth
+            // transition when the animation starts. Don't start THIS animation, though,
+            // until the page-turn one completes.
+            (<CSSStyleSheet> stylesheet).insertRule(".bloom-animate { transform-origin: 0px 0px; transform: "
+                 + initialTransform + ";}", 0);
         } else {
             //Insert the keyframe animation rule with the dynamic begin and end set
             (<CSSStyleSheet> stylesheet).insertRule("@keyframes movepic { from{ transform-origin: 0px 0px; transform: "
@@ -75,7 +118,6 @@ class Animation {
                 + "; animation-name: movepic; animation-duration: "
                 + PageDuration + "s; animation-fill-mode: forwards; }", 1);
         }
-        this.addClass(animationView, "bloom-animate"); // add the class that triggers the animation
     }
 
     // We cannot be absolutely sure whether the page transition or collecting the audio lengths will
@@ -107,13 +149,28 @@ class Animation {
         }
     }
 
+    private static removeClass(elt: Element, className: string) {
+        const index = elt.className.indexOf(className);
+        if (index >= 0) {
+            elt.className = elt.className.slice(0, index)
+                + elt.className.slice(index + className.length, elt.className.length);
+        }
+    }
+
+    // a crude check good enough for the long class names we care about here.
+    private static hasClass(elt: Element, className: string) {
+        return elt.className.indexOf(className) >= 0;
+    }
+
     private static getAnimationStylesheet(): HTMLStyleElement {
         let animationElement = document.getElementById("animationSheet");
         if (!animationElement) {
             animationElement = document.createElement("style");
             animationElement.setAttribute("type", "text/css");
             animationElement.setAttribute("id", "animationSheet");
-            animationElement.innerText = ".bloom-imageContainer {overflow: hidden}";
+            animationElement.innerText = ".bloom-ui-animationWrapper {overflow: hidden} "
+                + ".bloom-animate {height: 100%; width: 100%; "
+                + "background-repeat: no-repeat; background-size: contain}";
             document.body.appendChild(animationElement);
         }
         return <HTMLStyleElement> animationElement;
