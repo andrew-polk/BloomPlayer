@@ -30,9 +30,9 @@ export function Scale(): number {
 function adjust() {
     console.log("adjusting");
 
-    const carousel = document.getElementById("pages-carousel");
-    if (carousel) {
-        carousel.style.transform = "scale(" + Scale() + ")";
+    const scaler = document.getElementById("scaler");
+    if (scaler) {
+        scaler.style.transform = "scale(" + Scale() + ")";
     }
 }
 

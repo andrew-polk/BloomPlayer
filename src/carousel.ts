@@ -1,4 +1,4 @@
-import "./navigation.less";
+import "./controls.less";
 import LiteEvent from "./event";
 
 export var PageVisible: LiteEvent<HTMLElement>;

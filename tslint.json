@@ -3,6 +3,7 @@
     "rules": {
         "comment-format": false,
         "no-console": false,
-        "no-debugger": false
+        "no-debugger": false,
+        "no-reference": false // I don't see how to *not* use references for typings
     }
 }
