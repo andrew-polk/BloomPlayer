@@ -2,11 +2,9 @@ import {Navigation} from "./navigation";
 import {SetupLayout} from "./layout";
 import {SetupAnimation} from "./animation";
 import {SetupMusic} from "./music";
-import {SetupNarration, SetupNarrationEvents, PageNarrationComplete} from "./narration";
-import {GoNextPage} from "./carousel";
+import {SetupNarration, SetupNarrationEvents} from "./narration";
 
 function attach() {
-
     SetupLayout();
 
     const nav = new Navigation(); // first: sets up events others hook
