@@ -115,8 +115,8 @@ export class Carousel {
                         this.carousel().style.transition = "";
                         this.carousel().style.left = "0px";
 
-                        if (current) {
-                            PageVisible.raise(current);
+                        if (targetPage) {
+                            PageVisible.raise(targetPage);
                         }
         }, 500);
     }

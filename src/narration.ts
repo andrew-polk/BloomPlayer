@@ -46,14 +46,14 @@ class Narration {
         this.setStatus("listen", Status.Active);
         this.playCurrentInternal();
     }
-
+    
     public static computeDuration(page: HTMLElement): void {
-        const durationPlayer = this.getAudio("bloom-duration");
+
         this.playerPage = page;
-        const segments = this.getAudioElements();
-        let duration = 0.0;
-        let index = 0;
-        if (segments.length === 0) {
+        this.segments = this.getAudioElements();
+        this.pageDuration = 0.0;
+        this.segmentIndex = 0;
+        if (this.segments.length === 0) {
             PageDuration = 2.0;
             PageDurationAvailable.raise(page);
             setTimeout(function() {
@@ -63,34 +63,41 @@ class Narration {
             return;
         }
         const outerThis = this;
-
-        function getNextSegment() {
-            index++;
-            if (index < segments.length) {
-                durationPlayer.setAttribute("src", outerThis.currentAudioUrl(segments[index].getAttribute("id")));
-            } else {
-                if (duration < 1.0) {
-                    duration = 1.0; // maybe too small?
-                }
-                PageDuration = duration;
-                PageDurationAvailable.raise(page);
-            }
-        }
-
-        durationPlayer.addEventListener("durationchange", () => {
-            duration += durationPlayer.duration;
-            getNextSegment();
-        });
-        durationPlayer.addEventListener("error", () => {
-            getNextSegment(); // can't get a length for this segment, move on.
-        });
         // trigger first duration evaluation.
-        durationPlayer.setAttribute("src", this.currentAudioUrl(segments[0].getAttribute("id")));
+        this.getDurationPlayer().setAttribute("src", this.currentAudioUrl(this.segments[0].getAttribute("id")));
     }
 
     private static playerPage: HTMLElement;
     private static idOfCurrentSentence: string;
     private static playingAll: boolean;
+    private static segments: HTMLElement[];
+    private static segmentIndex: number;
+    private static pageDuration: number;
+    
+    private static getDurationPlayer(): HTMLMediaElement {
+        return this.getAudio("bloom-duration", (audio) => {
+            audio.addEventListener("durationchange", (ev) => {
+                this.pageDuration += audio.duration;
+                this.getNextSegment();
+            });
+            audio.addEventListener("error", (ev) => {
+                this.getNextSegment(); // can't get a length for this segment, move on.
+            });
+        });
+    }
+    
+    private static getNextSegment() {
+        this.segmentIndex++;
+        if (this.segmentIndex < this.segments.length) {
+            this.getDurationPlayer().setAttribute("src", this.currentAudioUrl(this.segments[this.segmentIndex].getAttribute("id")));
+        } else {
+            if (this.pageDuration < 1.0) {
+                this.pageDuration = 1.0; // maybe too small?
+            }
+            PageDuration = this.pageDuration;
+            PageDurationAvailable.raise(this.playerPage);
+        }
+    }
 
     // Returns all elements that match CSS selector {expr} as an array.
     // Querying can optionally be restricted to {container}’s descendants
@@ -132,18 +139,20 @@ class Narration {
     }
 
     private static getPlayer(): HTMLMediaElement {
-        return this.getAudio("player");
+        return this.getAudio("player", (audio) => {
+              // if we just pass the function, it has the wrong "this"
+             audio.addEventListener("ended", () => this.playEnded());
+             audio.addEventListener("error", () => this.playEnded());           
+        });
     }
 
-    private static getAudio(id: string) {
+    private static getAudio(id: string, init: Function) {
          let player  = document.querySelector("#" + id);
          if (!player) {
              player = document.createElement("audio");
              player.setAttribute("id", id);
              document.body.appendChild(player);
-             // if we just pass the function, it has the wrong "this"
-             player.addEventListener("ended", () => this.playEnded());
-             player.addEventListener("error", () => this.playEnded());
+             init(player);
          }
          return <HTMLMediaElement> player;
     }
