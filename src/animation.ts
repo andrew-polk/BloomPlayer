@@ -88,7 +88,12 @@ class Animation {
                 const imageWidth = viewHeight * imageAspectRatio;
                 wrapDiv.setAttribute("style", "height: 100%; width: " + imageWidth
                     + "px; left: " + (viewWidth - imageWidth) / 2  + "px");
-            } // todo: else: black bars top and bottom
+            } else {
+                // black bars top and bottom
+                const imageHeight = viewWidth / imageAspectRatio;
+                wrapDiv.setAttribute("style", "width: 100%; height: " + imageHeight
+                    + "px; top: " + (viewHeight - imageHeight) / 2  + "px");
+            }
             // Todo: if the original div had content (typically an <img>), move it
             let styleData = animationView.getAttribute("style");
             if (styleData) {
