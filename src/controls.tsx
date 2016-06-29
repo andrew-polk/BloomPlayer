@@ -3,7 +3,7 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import {Carousel} from "./carousel";
 import "./controls.less";
-
+import {ToggleMusic} from "./music";
 export default class Controls {
     private carousel: Carousel;
 
@@ -15,12 +15,11 @@ export default class Controls {
 
         ReactDOM.render(
             <div id="controls">
-
                 <div id="toolbar">
                     <div id="homeButton" className="button"
                         onClick={() => this.carousel.showFirstPage()}/>
                     <div id="musicButton" className="button"
-                        onClick={() => alert("will someday toggle music")}/>
+                        onClick={() => ToggleMusic.raise() }/>
                     <div id="narrationButton" className="button"
                         onClick={() => alert("will someday toggle narration")}/>
                     <div id="bloomButton" className="button"
