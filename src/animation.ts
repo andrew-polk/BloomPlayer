@@ -81,28 +81,44 @@ class Animation {
             this.addClass(wrapDiv, wrapperClassName);
             const movingDiv = document.createElement("div");
             wrapDiv.appendChild(movingDiv);
-            const imageAspectRatio = 4 / 3; // Enhance: get from image
+            let imageAspectRatio = 4 / 3; // default in case we're not using background image
             const viewAspectRatio = viewWidth / viewHeight;
-            if (imageAspectRatio < viewAspectRatio) {
-                // black bars on side
-                const imageWidth = viewHeight * imageAspectRatio;
-                wrapDiv.setAttribute("style", "height: 100%; width: " + imageWidth
-                    + "px; left: " + (viewWidth - imageWidth) / 2  + "px");
-            } else {
-                // black bars top and bottom
-                const imageHeight = viewWidth / imageAspectRatio;
-                wrapDiv.setAttribute("style", "width: 100%; height: " + imageHeight
-                    + "px; top: " + (viewHeight - imageHeight) / 2  + "px");
+
+            function updateWrapDivSize() {
+                if (imageAspectRatio < viewAspectRatio) {
+                    // black bars on side
+                    const imageWidth = viewHeight * imageAspectRatio;
+                    wrapDiv.setAttribute("style", "height: 100%; width: " + imageWidth
+                        + "px; left: " + (viewWidth - imageWidth) / 2  + "px");
+                } else {
+                    // black bars top and bottom
+                    const imageHeight = viewWidth / imageAspectRatio;
+                    wrapDiv.setAttribute("style", "width: 100%; height: " + imageHeight
+                        + "px; top: " + (viewHeight - imageHeight) / 2  + "px");
+                }
             }
-            // Todo: if the original div had content (typically an <img>), move it
-            let styleData = animationView.getAttribute("style");
+
+            const styleData = animationView.getAttribute("style");
             if (styleData) {
                 // This somewhat assumes the ONLY style attribute is the background image.
                 // I think we can improve that when and if it becomes an issue.
-
                 animationView.setAttribute("style", "");
                 movingDiv.setAttribute("style", styleData);
+                const imageSrc = styleData.replace(/.*url\((['"])([^)]*)\1\).*/i, "$2");
+                const image = new Image();
+                image.addEventListener("load", () => {
+                    if (image.height) {  // some browsers may not produce this?
+                        imageAspectRatio = image.width / image.height;
+                        updateWrapDivSize();
+                    }
+                });
+                image.src = imageSrc;
+            } else {
+                updateWrapDivSize(); // just do it with the ratio we guessed.
             }
+
+            // Todo: if the original div had content (typically an <img>), move it
+            // (and try to use its image to figure aspect ratio)
             movingDiv.setAttribute("class", "bloom-animate");
         }
 
