@@ -1,14 +1,16 @@
 /// <reference path="../typings/index.d.ts" />
 
 import {SetupLayout} from "./layout";
-import {SetupAnimation} from "./animation";
+import Animation from "./animation";
 import {SetupMusic} from "./music";
 import {SetupNarration, SetupNarrationEvents} from "./narration";
 import Controls from "./controls";
 import {Carousel} from "./carousel";
 import {Scale} from "./layout";
-import {PageVisible} from "./carousel";
+//import {PageVisible} from "./carousel";
 
+let animation: Animation;
+let controls: Controls;
 
 function attach() {
     SetupLayout();
@@ -16,7 +18,7 @@ function attach() {
     setUpDomForPlaying();
 
     SetupNarrationEvents();  // very early, defines events others subscribe to.
-    SetupAnimation();
+    animation = new Animation();
     SetupMusic();
     SetupNarration();
 
@@ -41,7 +43,7 @@ function setUpDomForPlaying() {
     window.setTimeout( () => scalerElement.style.transform =  "scale(" + Scale() + ")");
 
     (<any> window).carousel = new Carousel(scalerElement);
-    new Controls().show( (<any> window).carousel);
+    controls = new Controls((<any> window).carousel);
 }
 
 document.addEventListener("DOMContentLoaded", attach, false);
