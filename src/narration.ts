@@ -1,5 +1,6 @@
 import {PageVisible, PageBeforeVisible, PageHidden} from "./carousel";
 import LiteEvent from "./event";
+import {Play, Pause} from "./controls";
 
 export function SetupNarration(): void {
     PageVisible.subscribe(page => {
@@ -11,6 +12,8 @@ export function SetupNarration(): void {
     PageBeforeVisible.subscribe(page => {
         Narration.computeDuration(page);
     });
+
+    Narration.subscribeEvents();
 }
 
 // This can (and should) be called very early in the setup process, before any of the setup calls that use
@@ -34,6 +37,12 @@ enum Status {
 };
 
 class Narration {
+
+    public static subscribeEvents() {
+        Play.subscribe( () => Narration.getPlayer().play());
+        Pause.subscribe( () => Narration.getPlayer().pause());
+    }
+
     // "Listen" is shorthand for playing all the sentences on the page in sequence.
     public static listen(page: HTMLElement): void {
         this.playerPage = page;
@@ -48,7 +57,6 @@ class Narration {
     }
 
     public static computeDuration(page: HTMLElement): void {
-
         this.playerPage = page;
         this.segments = this.getAudioElements();
         this.pageDuration = 0.0;

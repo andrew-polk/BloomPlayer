@@ -4,8 +4,14 @@ import * as ReactDOM from "react-dom";
 import {Carousel} from "./carousel";
 import "./controls.less";
 import {ToggleMusic} from "./music";
+import LiteEvent from "./event";
+
+export var Play: LiteEvent<void>;
+export var Pause: LiteEvent<void>;
+
 export default class Controls {
     private carousel: Carousel;
+    private paused: Boolean = false;
 
     public show( carousel: Carousel) {
         this.carousel = carousel;
@@ -29,7 +35,17 @@ export default class Controls {
                     <div id="previousButton" className="button"
                         onClick={() => this.carousel.gotoPreviousPage()} />
                     <div id="playAndPauseButton" className="button"
-                        onClick={() => alert("will someday play and pause")}/>
+                        onClick={(event: Event) => {
+                            this.paused = !this.paused;
+                            const btn: HTMLElement = event.target as HTMLElement;
+                            if (this.paused) {
+                                btn.classList.add("paused");
+                                Pause.raise();
+                            } else {
+                                btn.classList.remove("paused");
+                                Play.raise();
+                            }
+                        }} />
                     <div id="nextButton" className="button"
                         onClick={() => this.carousel.gotoNextPage()} />
                 </div>

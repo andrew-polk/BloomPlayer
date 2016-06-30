@@ -94,7 +94,11 @@
 
         @playAndPauseButtonSize: 7em;
         #playAndPauseButton{
-            background-image: url('../assets/play.svg');
+            background-image: url('../assets/pause.svg');
+            &.paused{
+                background-image: url('../assets/play.svg');
+            }
+
             background-size: contain;
             border: none;
             height: @playAndPauseButtonSize;

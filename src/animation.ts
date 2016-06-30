@@ -1,5 +1,6 @@
 import {PageVisible, PageBeforeVisible, PageHidden} from "./carousel";
 import {PageDuration, PageDurationAvailable} from "./narration";
+//import {Play, Pause} from "./controls";
 
 export function SetupAnimation(): void {
     PageVisible.subscribe(page => {
@@ -21,10 +22,23 @@ export function SetupAnimation(): void {
 interface IAnimation { initialrect: string;  finalrect: string; }
 
 class Animation {
+    public static paused: Boolean;
+
+/*  I think this will be a lot cleaner if we convert this to a real class, with 
+    real member variables.
+
+    Play.subscribe( () =>  animationView.style = styleWeWereAimingForWhenPaused );
+    Pause.subscribe( () => {
+                styleWeWereAimingForWhenPaused = animationView.style;
+                animationView.style = window.getComputedStyle(animationView);
+        });
+*/
     public static setupAnimation(page: HTMLElement, beforeVisible: boolean): void {
+
         const animationView = <HTMLElement> ([].slice.call(page.getElementsByClassName("bloom-imageContainer"))
             .find(v => (<IAnimation> v.dataset).initialrect));
         if (!animationView) {return; } // no image to animate
+
         this.removeClass(animationView, "bloom-animate"); // make sure the animation isn't triggered until we set it up.
         const stylesheet = this.getAnimationStylesheet().sheet;
         const initialRectStr = (<IAnimation> <any> animationView.dataset).initialrect;

@@ -7,8 +7,7 @@ import {SetupNarration, SetupNarrationEvents} from "./narration";
 import Controls from "./controls";
 import {Carousel} from "./carousel";
 import {Scale} from "./layout";
-import {PageVisible} from "./carousel";
-
+//import {PageVisible} from "./carousel";
 
 function attach() {
     SetupLayout();
