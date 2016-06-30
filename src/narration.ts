@@ -1,10 +1,10 @@
 import {PageVisible, PageBeforeVisible, PageHidden} from "./carousel";
 import LiteEvent from "./event";
-import {Play, Pause} from "./controls";
+import {Play, Pause, IsPaused} from "./controls";
 
 export function SetupNarration(): void {
     PageVisible.subscribe(page => {
-        Narration.listen(page);
+        Narration.playAllSentences(page);
     });
     PageHidden.subscribe(page => {
         // Todo: stop playing?
@@ -43,8 +43,7 @@ class Narration {
         Pause.subscribe( () => Narration.getPlayer().pause());
     }
 
-    // "Listen" is shorthand for playing all the sentences on the page in sequence.
-    public static listen(page: HTMLElement): void {
+    public static playAllSentences(page: HTMLElement): void {
         this.playerPage = page;
         const audioElts = this.getAudioElements();
         if (audioElts.length === 0) { return; } // nothing to play.
@@ -192,7 +191,9 @@ class Narration {
     }
 
     private static playCurrentInternal() {
-        this.getPlayer().play();
+        if (!IsPaused()) {
+            this.getPlayer().play();
+        }
     }
 
     private static playEnded(): void {

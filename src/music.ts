@@ -1,5 +1,6 @@
 import {PageVisible, PageHidden} from "./carousel";
 import LiteEvent from "./event";
+import {Play, Pause} from "./controls";
 export var ToggleMusic: LiteEvent<HTMLElement>;
 
 let music: Music;
@@ -29,6 +30,9 @@ export class Music {
                 this.getPlayer().pause();
             }
         });
+
+        Play.subscribe( () => this.getPlayer().play());
+        Pause.subscribe( () => {this.getPlayer().pause(); });
     }
 
     public pageHasMusic(page: HTMLElement): boolean {
