@@ -1,4 +1,4 @@
-import {PageVisible, PageBeforeVisible, PageHidden} from "./carousel";
+import {PageVisible, PageBeforeVisible, PageHidden} from "./navigation";
 import LiteEvent from "./event";
 import {Play, Pause, IsPaused} from "./controls";
 

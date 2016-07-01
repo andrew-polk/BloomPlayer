@@ -1,7 +1,7 @@
 /// <reference path="../typings/index.d.ts" />
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import {Carousel} from "./carousel";
+import Navigation from "./navigation";
 import "./controls.less";
 import {ToggleMusic} from "./music";
 import LiteEvent from "./event";
@@ -15,11 +15,13 @@ export function IsPaused(): Boolean {
     return paused;
 }
 
+// Controls is the overlay of buttons that controls
+// navigation, play/pause, toggling the music, etc.
 export default class Controls {
-    private carousel: Carousel;
+    private navigation: Navigation;
 
-    public constructor( carousel: Carousel) {
-        this.carousel = carousel;
+    public constructor( navigation: Navigation) {
+        this.navigation = navigation;
         Play = new LiteEvent<void>();
         Pause = new LiteEvent<void>();
 
@@ -30,7 +32,7 @@ export default class Controls {
             <div id="controls">
                 <div id="toolbar">
                     <div id="homeButton" className="button"
-                        onClick={() => this.carousel.showFirstPage()}/>
+                        onClick={() => this.navigation.showFirstPage()}/>
                     <div id="musicButton" className="button"
                         onClick={() => ToggleMusic.raise() }/>
                     {/* <div id="narrationButton" className="button"
@@ -40,7 +42,7 @@ export default class Controls {
                 </div>
                 <div id="middleBar">
                     <div id="previousButton" className="button"
-                        onClick={() => this.carousel.gotoPreviousPage()} />
+                        onClick={() => this.navigation.gotoPreviousPage()} />
                     <div id="playAndPauseButton" className="button"
                         onClick={(event: Event) => {
                             paused = !paused;
@@ -54,7 +56,7 @@ export default class Controls {
                             }
                         }} />
                     <div id="nextButton" className="button"
-                        onClick={() => this.carousel.gotoNextPage()} />
+                        onClick={() => this.navigation.gotoNextPage()} />
                 </div>
             </div>,
       controlsElement

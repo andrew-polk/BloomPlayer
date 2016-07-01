@@ -1,5 +1,8 @@
 import "./layout.less";
 
+// "Layout" here is the task of fitting the material to the device
+// and orientation.
+
 export function SetupLayout() {
     //tell smart phone that we are taking care of zooming to fit them
     document.head.insertAdjacentHTML("afterBegin",

@@ -1,4 +1,4 @@
-import {PageVisible, PageBeforeVisible, PageHidden} from "./carousel";
+import {PageVisible, PageBeforeVisible, PageHidden} from "./navigation";
 import {PageDuration, PageDurationAvailable} from "./narration";
 import {Play, Pause /*, IsPaused*/} from "./controls";
 

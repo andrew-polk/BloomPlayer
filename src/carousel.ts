@@ -1,20 +1,14 @@
-import "./controls.less";
-import LiteEvent from "./event";
+import {PageVisible, PageBeforeVisible, PageHidden} from "./navigation";
 
-export var PageVisible: LiteEvent<HTMLElement>;
-export var PageBeforeVisible: LiteEvent<HTMLElement>;
-export var PageHidden: LiteEvent<HTMLElement>;
-export var GoNextPage: LiteEvent<void>;
-
-export class Carousel {
+// The Carousel is one system for transitioning between pages.
+// It transitions by sliding pages in and out, in approximation
+// of page turning. So it is appropriate if the user would think
+// of this as a book (as opposed to a video).
+export default class Carousel {
 
     private pageBeingHidden: HTMLElement;
 
     public constructor(parent: HTMLElement) {
-        PageVisible = new LiteEvent<HTMLElement>();
-        PageBeforeVisible = new LiteEvent<HTMLElement>();
-        PageHidden = new LiteEvent<HTMLElement>();
-
         parent.insertAdjacentHTML("afterbegin", "<div id='pages-carousel'></div>");
         const carousel = document.getElementById("pages-carousel");
 
@@ -29,45 +23,12 @@ export class Carousel {
         }
     }
 
+    //TODO better way to do this?
     public showFirstPage() {
-        [].forEach.call(document.body.querySelectorAll(".bloom-page"), function(page){
-                page.classList.remove("currentPage");
-            });
-
-        this.firstPage().classList.add("currentPage");
         this.carousel().style.left = "0px";
-        // No animation of showing first page, but seems safest to
-        // raise this event anyway.
-        PageBeforeVisible.raise(this.firstPage());
-        PageVisible.raise(this.firstPage());
     }
 
-    public  gotoNextPage(): void {
-         this.transitionPage(this.currentPage().nextElementSibling  as HTMLElement, true);
-    }
-
-    public  gotoPreviousPage(): void {
-        const target = this.currentPage().previousElementSibling  as HTMLElement;
-        if (target.classList.contains("bloom-page")) {
-            this.transitionPage(target, false);
-        }
-    }
-
-    private carousel(): HTMLElement {
-        return  document.getElementById("pages-carousel");
-    }
-    private  currentPage(): HTMLElement {
-        return this.carousel().getElementsByClassName("currentPage")[0] as HTMLElement;
-    }
-    private  firstPage(): HTMLElement {
-        return document.body.getElementsByClassName("bloom-page")[0] as HTMLElement;
-    }
-
-    private  pageWidth(): number {
-        return this.currentPage().scrollWidth;
-    }
-
-    private  transitionPage(targetPage: HTMLElement, goForward: boolean): void {
+    public transitionPage(targetPage: HTMLElement, goForward: boolean): void {
         const current = this.currentPage();
         // Here we set a new 'left' or 'right' and will animate transition from 0 to that new value.
         // As soon as it is done, an 'transtionend' event will just hide that page completely
@@ -119,6 +80,17 @@ export class Carousel {
                             PageVisible.raise(targetPage);
                         }
         }, 500);
+    }
+
+    private carousel(): HTMLElement {
+        return  document.getElementById("pages-carousel");
+    }
+    private  currentPage(): HTMLElement {
+        return this.carousel().getElementsByClassName("currentPage")[0] as HTMLElement;
+    }
+
+    private  pageWidth(): number {
+        return this.currentPage().scrollWidth;
     }
 }
 

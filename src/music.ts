@@ -1,4 +1,4 @@
-import {PageVisible, PageHidden} from "./carousel";
+import {PageVisible, PageHidden} from "./navigation";
 import LiteEvent from "./event";
 import {Play, Pause} from "./controls";
 export var ToggleMusic: LiteEvent<HTMLElement>;
