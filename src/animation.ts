@@ -12,6 +12,9 @@ export default class Animation {
     private  lastDurationPage: HTMLElement;
     private animationView: HTMLElement;
     private styleWeWereAimingForWhenPaused: CSSStyleDeclaration;
+    private permanentRuleCount: number; // rules from initial creation of stylesheet
+    // incremented for each animated div, to keep animation rules for each one distinct
+    private ruleModifier: number = 0;
 
      constructor() {
         PageVisible.subscribe(page => {
@@ -52,8 +55,6 @@ export default class Animation {
             .find(v => (<IAnimation> v.dataset).initialrect));
         if (!this.animationView) {return; } // no image to animate
 
-        // make sure the animation isn't triggered until we set it up.
-        this.removeClass(this.animationView, "bloom-animate");
         const stylesheet = this.getAnimationStylesheet().sheet;
         const initialRectStr = (<IAnimation> <any> this.animationView.dataset).initialrect;
 
@@ -80,11 +81,13 @@ export default class Animation {
 
         console.log(initialTransform);
         console.log(finalTransform);
-        while ((<CSSStyleSheet> stylesheet).cssRules.length > 2) {
-            // remove rules from some previous picture
-            (<CSSStyleSheet> stylesheet).removeRule(0);
+        // remove obsolete rules. We want to keep the permanent rules and the ones for the previous page
+        // (which may still be visible). That's at most 2. It's harmless to keep an extra one.
+        while ((<CSSStyleSheet> stylesheet).cssRules.length > this.permanentRuleCount + 2) {
+            // remove the last (oldest, since we add at start) non-permanent rule
+            (<CSSStyleSheet> stylesheet).removeRule((<CSSStyleSheet> stylesheet).cssRules.length
+                - this.permanentRuleCount - 1);
         }
-
         // We expect to see something like this:
         // <div class="bloom-imageContainer bloom-backgroundImage bloom-leadingElement"
         // style="background-image:url('1.jpg')"
@@ -97,13 +100,25 @@ export default class Animation {
         // We want to make something like this:
         // <div ...with all the original properties minus the background-image style>
         //      <div class="bloom-ui-animationWrapper" style = "width: 400px; height; 100%">
-        //          <div class="bloom-animate" style="background-image:url('1.jpg'); width: 400px; height; 300px"/>
+        //          <div class="bloom-animate bloom-animateN" style="background-image:url('1.jpg');
+        //               width: 400px; height; 300px"/>
         //              ...original content...
         //          </div>
         //      </div>
         // </div>
         const wrapperClassName = "bloom-ui-animationWrapper";
-        if (!this.hasClass(this.animationView, wrapperClassName)) {
+        // Assign each animation div a unique number so their rules are distinct.
+        let ruleMod = this.animationView.getAttribute("data-animationNumber");
+        if (!ruleMod) {
+            ruleMod = "" + this.ruleModifier++;
+            this.animationView.setAttribute("data-animationNumber", ruleMod);
+        }
+        const animateStyleName = "bloom-animate" + ruleMod;
+        const movePicName = "movepic" + ruleMod;
+
+        if (this.animationView.children.length !== 1
+            || !this.hasClass(<HTMLElement> this.animationView.firstChild, wrapperClassName)) {
+
             const wrapDiv = document.createElement("div");
             this.animationView.appendChild(wrapDiv);
             this.addClass(wrapDiv, wrapperClassName);
@@ -125,7 +140,6 @@ export default class Animation {
                         + "px; top: " + (viewHeight - imageHeight) / 2  + "px");
                 }
             }
-
             const styleData = this.animationView.getAttribute("style");
             if (styleData) {
                 // This somewhat assumes the ONLY style attribute is the background image.
@@ -147,24 +161,33 @@ export default class Animation {
 
             // Todo: if the original div had content (typically an <img>), move it
             // (and try to use its image to figure aspect ratio)
-            movingDiv.setAttribute("class", "bloom-animate");
+            // Give this rule the class bloom-animate to trigger the rule created in getAnimationStylesheet,
+            // and bloom-animationN to trigger the one we are about to create for page-specific animation.
+            movingDiv.setAttribute("class", "bloom-animate " + animateStyleName);
         }
 
         if (beforeVisible) {
             // this rule puts it in the initial state for the animation, so we get a smooth
             // transition when the animation starts. Don't start THIS animation, though,
             // until the page-turn one completes.
-            (<CSSStyleSheet> stylesheet).insertRule(".bloom-animate { transform-origin: 0px 0px; transform: "
+            (<CSSStyleSheet> stylesheet).insertRule("." + animateStyleName + " { transform-origin: 0px 0px; transform: "
                  + initialTransform + ";}", 0);
         } else {
+            // Remove the rule inserted by the beforeVisible event (but not any permanent rules).
+            // Enhance: can we more reliably remove what and only what beforeVisible added, e.g.
+            // by looking for all rules that apply to animateStyleName?
+            if ((<CSSStyleSheet> stylesheet).cssRules.length > this.permanentRuleCount) {
+                (<CSSStyleSheet> stylesheet).removeRule(0);
+            }
             //Insert the keyframe animation rule with the dynamic begin and end set
-            (<CSSStyleSheet> stylesheet).insertRule("@keyframes movepic { from{ transform-origin: 0px 0px; transform: "
-                + initialTransform + "; } to{ transform-origin: 0px 0px; transform: " + finalTransform + "; } }", 0);
+            (<CSSStyleSheet> stylesheet).insertRule("@keyframes " + movePicName
+                + " { from{ transform-origin: 0px 0px; transform: " + initialTransform
+                + "; } to{ transform-origin: 0px 0px; transform: " + finalTransform + "; } }", 0);
 
             //Insert the css for the imageView div that utilizes the newly created animation
-            (<CSSStyleSheet> stylesheet).insertRule(".bloom-animate { transform-origin: 0px 0px; transform: "
+            (<CSSStyleSheet> stylesheet).insertRule("." + animateStyleName + " { transform-origin: 0px 0px; transform: "
                 + initialTransform
-                + "; animation-name: movepic; animation-duration: "
+                + "; animation-name: " + movePicName + "; animation-duration: "
                 + PageDuration + "s; animation-fill-mode: forwards; }", 1);
         }
     }
@@ -195,16 +218,19 @@ export default class Animation {
         }
     }
 
-    private  removeClass(elt: Element, className: string) {
-        const index = elt.className.indexOf(className);
-        if (index >= 0) {
-            elt.className = elt.className.slice(0, index)
-                + elt.className.slice(index + className.length, elt.className.length);
-        }
-    }
+    // private  removeClass(elt: Element, className: string) {
+    //     const index = elt.className.indexOf(className);
+    //     if (index >= 0) {
+    //         elt.className = elt.className.slice(0, index)
+    //             + elt.className.slice(index + className.length, elt.className.length);
+    //     }
+    // }
 
     // a crude check good enough for the long class names we care about here.
     private  hasClass(elt: Element, className: string) {
+        if (!elt || !elt.className) {
+            return false;
+        }
         return elt.className.indexOf(className) >= 0;
     }
 
@@ -218,6 +244,7 @@ export default class Animation {
                 + ".bloom-animate {height: 100%; width: 100%; "
                 + "background-repeat: no-repeat; background-size: contain}";
             document.body.appendChild(animationElement);
+            this.permanentRuleCount = 2; // (<CSSStyleSheet> <any> animationElement).cssRules.length;
         }
         return <HTMLStyleElement> animationElement;
     }
