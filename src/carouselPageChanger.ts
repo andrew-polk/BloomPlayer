@@ -1,31 +1,21 @@
 import {PageVisible, PageBeforeVisible, PageHidden} from "./navigation";
+import {IPageChanger} from "./IPageChanger";
 
 // The Carousel is one system for transitioning between pages.
 // It transitions by sliding pages in and out, in approximation
 // of page turning. So it is appropriate if the user would think
 // of this as a book (as opposed to a video).
-export default class Carousel {
+export default class CarouselPageChanger implements IPageChanger {
 
     private pageBeingHidden: HTMLElement;
 
     public constructor(parent: HTMLElement) {
-        parent.insertAdjacentHTML("afterbegin", "<div id='pages-carousel'></div>");
-        const carousel = document.getElementById("pages-carousel");
-
-        const pages = document.getElementsByClassName("bloom-page");
-
-        //REVIEW: doesn't work. we want to do this so that we can
-        // get it visible and determine the size of a page for setting the scale
-        pages[0].classList.add("currentPage");
-
-        for (let index = 0; index < pages.length; index++) {
-            carousel.appendChild(pages[index]);
-        }
+        //empty
     }
 
     //TODO better way to do this?
     public showFirstPage() {
-        this.carousel().style.left = "0px";
+        this.pageViewer().style.left = "0px";
     }
 
     public transitionPage(targetPage: HTMLElement, goForward: boolean): void {
@@ -34,7 +24,7 @@ export default class Carousel {
         // As soon as it is done, an 'transtionend' event will just hide that page completely
         // and reset the carousel's positioning to 'left:0' (regardless of whether we were manipulating
         // the 'left' (to go forward) or 'right' (to go backward)).
-        this.carousel().style.transition = ""; // "left 1.5s ease 0s, right 1.5s ease 0s";
+        this.pageViewer().style.transition = ""; // "left 1.5s ease 0s, right 1.5s ease 0s";
 
         const amount = Math.round(this.pageWidth());
         assertIsNumber(amount);
@@ -42,19 +32,19 @@ export default class Carousel {
         if (goForward) {
             //For some reason, browsers won't do transition effects from "auto" to some pixel value,
             //so we first have to change from "auto" to "0"
-            this.carousel().style.left = "0";
+            this.pageViewer().style.left = "0";
 
             //That needs to get registered before we then change it, so we defer the change
             window.setTimeout(() => {
-                  this.carousel().style.transition = "left .5s";
-                  this.carousel().style.left = (-1 * amount) + "px";
+                  this.pageViewer().style.transition = "left .5s";
+                  this.pageViewer().style.left = (-1 * amount) + "px";
             }, 100);
         } else {
             //need to change our right so that
-            this.carousel().style.left = (-1 * amount) + "px";
+            this.pageViewer().style.left = (-1 * amount) + "px";
             window.setTimeout(() => {
-                this.carousel().style.transition = "left .5s";
-                this.carousel().style.left = "0px";
+                this.pageViewer().style.transition = "left .5s";
+                this.pageViewer().style.left = "0px";
             }, 100);
         }
 
@@ -73,8 +63,8 @@ export default class Carousel {
 
         window.setTimeout(() => {
                         this.pageBeingHidden.classList.remove("currentPage");
-                        this.carousel().style.transition = "";
-                        this.carousel().style.left = "0px";
+                        this.pageViewer().style.transition = "";
+                        this.pageViewer().style.left = "0px";
 
                         if (targetPage) {
                             PageVisible.raise(targetPage);
@@ -82,11 +72,11 @@ export default class Carousel {
         }, 500);
     }
 
-    private carousel(): HTMLElement {
-        return  document.getElementById("pages-carousel");
+    private pageViewer(): HTMLElement {
+        return  document.getElementById("pageViewer");
     }
     private  currentPage(): HTMLElement {
-        return this.carousel().getElementsByClassName("currentPage")[0] as HTMLElement;
+        return this.pageViewer().getElementsByClassName("currentPage")[0] as HTMLElement;
     }
 
     private  pageWidth(): number {

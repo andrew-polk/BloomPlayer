@@ -1,6 +1,8 @@
 import "./controls.less";
 import LiteEvent from "./event";
-import Carousel from "./carousel";
+//import CarouselPageChanger from "./CarouselPageChanger";
+import FadePageChanger from "./fadePageChanger";
+import {IPageChanger} from "./IPageChanger";
 
 export var PageVisible: LiteEvent<HTMLElement>;
 export var PageBeforeVisible: LiteEvent<HTMLElement>;
@@ -13,7 +15,7 @@ export var GoNextPage: LiteEvent<void>;
 // this book will use and manages that system.
 export default class Navigation {
 
-    private carousel: Carousel;
+    private pageChanger: IPageChanger;
 
     public constructor(parent: HTMLElement) {
             PageVisible = new LiteEvent<HTMLElement>();
@@ -21,7 +23,11 @@ export default class Navigation {
             PageHidden = new LiteEvent<HTMLElement>();
             GoNextPage = new LiteEvent<void>();
             GoNextPage.subscribe( () => this.gotoNextPage());
-            this.carousel = new Carousel(parent);
+
+            this.setupViewerWrapper(parent);
+            this.pageChanger = new FadePageChanger(parent);
+            // TODO: Use the carousel changer one for normal books
+            // this.pageChanger = new CarouselPageChanger(parent);
     }
 
     public showFirstPage() {
@@ -32,7 +38,7 @@ export default class Navigation {
         this.firstPage().classList.add("currentPage");
 
         //TODO better way to do this?
-        this.carousel.showFirstPage();
+        this.pageChanger.showFirstPage();
         // No animation of showing first page, but seems safest to
         // raise this event anyway.
         PageBeforeVisible.raise(this.firstPage());
@@ -40,13 +46,27 @@ export default class Navigation {
     }
 
     public  gotoNextPage(): void {
-         this.carousel.transitionPage(this.currentPage().nextElementSibling  as HTMLElement, true);
+         this.pageChanger.transitionPage(this.currentPage().nextElementSibling  as HTMLElement, true);
     }
 
     public  gotoPreviousPage(): void {
         const target = this.currentPage().previousElementSibling  as HTMLElement;
         if (target.classList.contains("bloom-page")) {
-            this.carousel.transitionPage(target, false);
+            this.pageChanger.transitionPage(target, false);
+        }
+    }
+
+    private setupViewerWrapper(parent: HTMLElement) {
+        parent.insertAdjacentHTML("afterbegin", "<div id='pageViewer'></div>");
+        const pageViewer = document.getElementById("pageViewer");
+        const pages = document.getElementsByClassName("bloom-page");
+
+        //REVIEW: doesn't work. we want to do this so that we can
+        // get it visible and determine the size of a page for setting the scale
+        pages[0].classList.add("currentPage");
+
+        for (let index = 0; index < pages.length; index++) {
+            pageViewer.appendChild(pages[index]);
         }
     }
 

@@ -63,10 +63,13 @@ class Narration {
         if (this.segments.length === 0) {
             PageDuration = 2.0;
             PageDurationAvailable.raise(page);
-            setTimeout(function() {
-                // Arbitrarily raise the event after this delay, so things move on.
-                PageNarrationComplete.raise(page);
-            }, PageDuration * 1000);
+            // this was causing page advance from the first page even when paused...
+            // I (JH) couldn't see why it was needed since we also detect the end of actual
+            // narration and then raise thise event.
+            // setTimeout(function() {
+            //     // Arbitrarily raise the event after this delay, so things move on.
+            //     PageNarrationComplete.raise(page);
+            // }, PageDuration * 1000);
             return;
         }
         // trigger first duration evaluation.

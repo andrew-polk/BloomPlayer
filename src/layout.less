@@ -2,6 +2,8 @@
 div.bloom-page{
     border-bottom: 0 !important;
     display: none !important; //we don't show unless we're selected
+
+    transition: opacity 0.5s;
 }
 
 
@@ -22,7 +24,7 @@ html,body{
      //border: solid 1px red;
 }
 
-#pages-carousel{
+#pageViewer{
      display: flex;
      flex-direction: row;
      //when we do the transform: scale(n), which is done via code, we want
