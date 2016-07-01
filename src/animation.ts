@@ -73,11 +73,14 @@ export default class Animation {
         const finalX = parseFloat(finalRect[0]) * viewWidth;
         const finalY = parseFloat(finalRect[1]) * viewHeight;
 
-        //Will take the form of "scale(W, H) translate(Xpx, Ypx)"
-        const initialTransform = "scale(" + initialScaleWidth + ", " + initialScaleHeight
-            + ") translate(-" + initialX + "px, -" + initialY + "px)";
-        const finalTransform = "scale(" + finalScaleWidth + ", " + finalScaleHeight
-            + ") translate(-" + finalX + "px, -" + finalY + "px)";
+        // Will take the form of "scale3d(W, H,1.0) translate3d(Xpx, Ypx, 0px)"
+        // Using 3d scale and transform apparently causes GPU to be used and improves
+        // performance over scale/transform. (https://www.kirupa.com/html5/ken_burns_effect_css.htm)
+        // May also help with blurring of material originally hidden.
+        const initialTransform = "scale3d(" + initialScaleWidth + ", " + initialScaleHeight
+            + ", 1.0) translate3d(-" + initialX + "px, -" + initialY + "px, 0px)";
+        const finalTransform = "scale3d(" + finalScaleWidth + ", " + finalScaleHeight
+            + ", 1.0) translate3d(-" + finalX + "px, -" + finalY + "px, 0px)";
 
         console.log(initialTransform);
         console.log(finalTransform);
@@ -240,7 +243,7 @@ export default class Animation {
             animationElement = document.createElement("style");
             animationElement.setAttribute("type", "text/css");
             animationElement.setAttribute("id", "animationSheet");
-            animationElement.innerText = ".bloom-ui-animationWrapper {overflow: hidden} "
+            animationElement.innerText = ".bloom-ui-animationWrapper {overflow: hidden; translateZ(0)} "
                 + ".bloom-animate {height: 100%; width: 100%; "
                 + "background-repeat: no-repeat; background-size: contain}";
             document.body.appendChild(animationElement);
