@@ -21,10 +21,6 @@ export default class Animation {
             this.pageVisible(page);
         });
         PageBeforeVisible.subscribe(page => {
-
-                // TODO: if IsPaused is true, then when we change pages, we should not commence animation.
-                // However we do need to then respond to the Play event in order to start animation.
-
             this.setupAnimation(page, true);
         });
         PageHidden.subscribe(page => {
@@ -36,15 +32,18 @@ export default class Animation {
 
         Play.subscribe( () =>  {
             if (this.animationView) {
-                this.animationView.style = this.styleWeWereAimingForWhenPaused;
+                const stylesheet = this.getAnimationStylesheet().sheet;
+                (<CSSStyleSheet> stylesheet).removeRule((<CSSStyleSheet> stylesheet).cssRules.length - 1);
+                this.permanentRuleCount--;
             }
         });
         Pause.subscribe( () => {
             if (this.animationView) {
-                this.styleWeWereAimingForWhenPaused = this.animationView.style;
-
-                // TODO: this isn't having any effect
-                this.animationView.style = window.getComputedStyle(this.animationView);
+                const stylesheet = this.getAnimationStylesheet().sheet;
+                (<CSSStyleSheet> stylesheet).insertRule(
+                    ".bloom-animate {animation-play-state: paused; -webkit-animation-play-state: paused}",
+                    (<CSSStyleSheet> stylesheet).cssRules.length);
+                this.permanentRuleCount++; // not really permanent, but not to be messed with.
             }
         });
     }
