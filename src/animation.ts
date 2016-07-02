@@ -11,7 +11,6 @@ export default class Animation {
     private  currentPage: HTMLElement;
     private  lastDurationPage: HTMLElement;
     private animationView: HTMLElement;
-    private styleWeWereAimingForWhenPaused: CSSStyleDeclaration;
     private permanentRuleCount: number; // rules from initial creation of stylesheet
     // incremented for each animated div, to keep animation rules for each one distinct
     private ruleModifier: number = 0;
@@ -81,8 +80,8 @@ export default class Animation {
         const finalTransform = "scale3d(" + finalScaleWidth + ", " + finalScaleHeight
             + ", 1.0) translate3d(-" + finalX + "px, -" + finalY + "px, 0px)";
 
-        console.log(initialTransform);
-        console.log(finalTransform);
+        // console.log(initialTransform);
+        // console.log(finalTransform);
         // remove obsolete rules. We want to keep the permanent rules and the ones for the previous page
         // (which may still be visible). That's at most 2. It's harmless to keep an extra one.
         while ((<CSSStyleSheet> stylesheet).cssRules.length > this.permanentRuleCount + 2) {

@@ -20,29 +20,36 @@ export function IsPaused(): Boolean {
 export default class Controls {
     private navigation: Navigation;
 
-    public constructor( navigation: Navigation) {
+    public constructor(navigation: Navigation) {
         this.navigation = navigation;
         Play = new LiteEvent<void>();
         Pause = new LiteEvent<void>();
 
-        document.body.insertAdjacentHTML("afterbegin", "<div id='react-controls'></div>");
-        const controlsElement = document.getElementById("react-controls");
+        document.body.insertAdjacentHTML("afterbegin", "<div id='control-root'></div>");
+        const controlRoot: HTMLElement = document.getElementById("control-root");
+        controlRoot.addEventListener("touchstart", (event) => {
+            controlRoot.classList.add("touchCapabilityDetected");
+            controlRoot.classList.add("displayBasedOnTouch");
+            setTimeout(() =>
+                controlRoot.classList.remove("displayBasedOnTouch")
+                , 5000);
+        }, false);
 
         ReactDOM.render(
             <div id="controls">
                 <div id="toolbar">
                     <div id="homeButton" className="button"
-                        onClick={() => this.navigation.showFirstPage()}/>
+                        onClick={() => this.navigation.showFirstPage() }/>
                     <div id="musicButton" className="button"
                         onClick={() => ToggleMusic.raise() }/>
                     {/* <div id="narrationButton" className="button"
                         onClick={() => alert("will someday toggle narration")}/> */}
                     <div id="bloomButton" className="button"
-                        onClick={() => alert("This book was created with Bloom. Find more books at BloomLibrary.org")}/>
+                        onClick={() => alert("This book was created with Bloom. Find more books at BloomLibrary.org") }/>
                 </div>
                 <div id="middleBar">
                     <div id="previousButton" className="button"
-                        onClick={() => this.navigation.gotoPreviousPage()} />
+                        onClick={() => this.navigation.gotoPreviousPage() } />
                     <div id="playAndPauseButton" className="button"
                         onClick={(event: Event) => {
                             paused = !paused;
@@ -54,12 +61,12 @@ export default class Controls {
                                 btn.classList.remove("paused");
                                 Play.raise();
                             }
-                        }} />
+                        } } />
                     <div id="nextButton" className="button"
-                        onClick={() => this.navigation.gotoNextPage()} />
+                        onClick={() => this.navigation.gotoNextPage() } />
                 </div>
             </div>,
-      controlsElement
-    );
-  }
+            controlRoot
+        );
+    }
 }

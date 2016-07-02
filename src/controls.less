@@ -1,17 +1,22 @@
-
-#react-controls{
+#control-root{
     background-color: rgba(210, 15, 15, 0);
     height: 100%;
     position: absolute;
     z-index: 20000;
     width: 100%;
-}
-#controls{
-    display: none; // normally, hide
-    body:hover &{
-        display: block; //show when mouse enters body
-    }
 
+    div{
+        display: none; // normally, hide
+    }
+    &.displayBasedOnTouch, body:hover &:not(.touchCapabilityDetected){
+        div {
+            display: block; //show when mouse enters body
+        }
+    }
+}
+
+//this one is rendered by react
+#controls {
     position: initial; // allows middleBar to use absolute positioning to move down to center
 
     @Margin: 20px;
