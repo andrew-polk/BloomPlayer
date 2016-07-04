@@ -179,14 +179,7 @@ class Narration {
     }
 
     private static currentAudioUrl(id: string): string {
-        return this.urlPrefix() + id + ".wav";
-    }
-
-    private static  urlPrefix(): string {
-        const bookSrc = document.URL;
-        const index = bookSrc.lastIndexOf("/");
-        const bookFolderUrl = bookSrc.substring(0, index + 1);
-        return bookFolderUrl + "audio/";
+        return "audio/" + id + ".wav";
     }
 
     private static setStatus(which: string, to: Status): void {
