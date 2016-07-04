@@ -2,7 +2,8 @@ var path = require('path');
 
 module.exports = {
     context: __dirname,
-    devtool: 'source-map',
+    //devtool: 'source-map', // cannot cache SourceMaps for modules and need to regenerate complete SourceMap for the chunk. It’s something for production.
+    devtool: '#cheap-module-eval-source-map', //the 'cheap' here means rows only, not columns
     entry: './src/app.ts',
 
     output: {

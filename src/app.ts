@@ -12,25 +12,28 @@ let animation: Animation;
 let controls: Controls;
 
 function attach() {
-    SetupLayout();
+    // this slight delay makes it possible to catch breakpoints in vscode even for things that happen right away.
+    window.setTimeout(() => {
+        SetupLayout();
 
-    setUpDomForPlaying();
+        setUpDomForPlaying();
 
-    SetupNarrationEvents();  // very early, defines events others subscribe to.
-    animation = new Animation();
-    SetupMusic();
-    SetupNarration();
+        SetupNarrationEvents();  // very early, defines events others subscribe to.
+        animation = new Animation();
+        SetupMusic();
+        SetupNarration();
 
-    (<any> window).navigation.showFirstPage();
+        (<any> window).navigation.showFirstPage();
 
-    //nav.GotoFirstPage(); // now go to first page again so that all the fancy stuff gets triggered
+        //nav.GotoFirstPage(); // now go to first page again so that all the fancy stuff gets triggered
 
-    //commented out because we are getting these events even if there is no narration.
-    PageNarrationComplete.subscribe(page => {
-        if (page === (<any> window).navigation.currentPage()) {
-             GoNextPage.raise();
-        }
-    });
+        //commented out because we are getting these events even if there is no narration.
+        PageNarrationComplete.subscribe(page => {
+            if (page === (<any> window).navigation.currentPage()) {
+                GoNextPage.raise();
+            }
+        });
+    }, 0);
 }
 
 function setUpDomForPlaying() {

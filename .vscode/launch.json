@@ -1,0 +1,46 @@
+{
+    // This works with the vscode debug Chrome extension, which you need to install (Ctrl+P: "ext install Debugger for Chrome")
+
+     // First, in a command prompt, run chrome in debugger mode:
+     //     "c:/Program Files (x86)/Google/Chrome/Application/chrome.exe" --remote-debugging-port=9222 -no-first-run --incognito
+
+    // To use with a local server
+    // 1) If you don't have it already, get a light-weight local server like nws or http-server (npm install -g nws)
+    // 2) In a cmd prompt, cd to the folder holding the book you want to test
+    // 3) Start up the server there (e.g. 'nws'). In chrome, confirm that you can see the book via "http://localhost:3030//index.html"
+
+    // To use with file system instead of a local server:
+    // 1) In the /output directory, Create and index.html that contains:
+    //   <meta http-equiv="refresh" content="0;url=file:///path-to-the-book-you-want-to-test-with/index.html">
+    // 2) change the "URL" line below to "${workspaceRoot}/output/index.html"
+
+
+    // Finally here in VSCODE, run Debug (F5, once you've done it once)
+
+    // This should open the page in Chrome. Breakpoints should point to the typescript.
+
+    // Troubleshooting tips:
+    // * Try restarting (clears out the bazillion chromes around).
+    // * Try avoiding using chrome for other things while doing this (e.g. use FF).
+    // * Uncomment the diagnosticLogging line below
+
+    "version": "0.1.0",
+    "configurations": [
+        {
+            "name": "Launch in Chrome",
+            "type": "chrome",
+            "request": "launch",
+
+            // would be convenient. It does launch chome, but vs code can't talk to it for some reason.
+            //  "runtimeExecutable": "c:/Program Files (x86)/Google/Chrome/Application/chrome.exe",
+            //  "runtimeArgs": [ "--remote-debugging-port=9222 --incognito" ],
+
+            "url": "http://localhost:3030",
+            //"url" : "${workspaceRoot}/output/index.html",
+            "webRoot": "${workspaceRoot}",
+            "sourceMaps": true,
+            "userDataDir": "${workspaceRoot}/output/chrome"
+            ,"diagnosticLogging": true
+        }
+    ]
+}
