@@ -9,12 +9,17 @@ export function SetupMusic() {
     music = new Music();
 }
 export class Music {
+
+    public static pageHasMusic(page: HTMLElement): boolean {
+        return page.attributes["data-backgroundaudio"];
+    }
+
     private playerPage: HTMLElement;
     private haveStartedMusic: Boolean;
 
     public constructor() {
         PageVisible.subscribe(page => {
-            if (this.pageHasMusic(page)) {
+            if (Music.pageHasMusic(page)) {
                 this.listen(page);
             }
         });
@@ -33,10 +38,6 @@ export class Music {
 
         Play.subscribe( () => this.getPlayer().play());
         Pause.subscribe( () => {this.getPlayer().pause(); });
-    }
-
-    public pageHasMusic(page: HTMLElement): boolean {
-        return page.attributes["data-backgroundaudio"];
     }
 
     public listen(page: HTMLElement): void {

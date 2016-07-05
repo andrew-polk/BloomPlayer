@@ -28,11 +28,13 @@ function attach() {
         //nav.GotoFirstPage(); // now go to first page again so that all the fancy stuff gets triggered
 
         //commented out because we are getting these events even if there is no narration.
-        PageNarrationComplete.subscribe(page => {
-            if (page === (<any> window).navigation.currentPage()) {
-                GoNextPage.raise();
-            }
-        });
+        if (controls.documentHasMultimedia()) {
+            PageNarrationComplete.subscribe(page => {
+                if (page === (<any> window).navigation.currentPage()) {
+                    GoNextPage.raise();
+                }
+            });
+        }
     }, 0);
 }
 

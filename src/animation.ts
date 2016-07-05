@@ -8,6 +8,11 @@ interface IAnimation { initialrect: string;  finalrect: string; }
 
 export default class Animation {
 
+    public static getAnimationView(parent: HTMLElement): HTMLElement {
+        return <HTMLElement> ([].slice.call(parent.getElementsByClassName("bloom-imageContainer"))
+            .find(v => (<IAnimation> v.dataset).initialrect));
+    }
+
     private  currentPage: HTMLElement;
     private  lastDurationPage: HTMLElement;
     private animationView: HTMLElement;
@@ -49,8 +54,7 @@ export default class Animation {
 
     public setupAnimation(page: HTMLElement, beforeVisible: boolean): void {
 
-        this.animationView = <HTMLElement> ([].slice.call(page.getElementsByClassName("bloom-imageContainer"))
-            .find(v => (<IAnimation> v.dataset).initialrect));
+        this.animationView = Animation.getAnimationView(page);
         if (!this.animationView) {return; } // no image to animate
 
         const stylesheet = this.getAnimationStylesheet().sheet;

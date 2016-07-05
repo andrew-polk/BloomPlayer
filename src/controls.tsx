@@ -5,6 +5,8 @@ import Navigation from "./navigation";
 import "./controls.less";
 import {ToggleMusic} from "./music";
 import LiteEvent from "./event";
+import Animation from "./animation";
+import {Music} from "./music";
 
 export var Play: LiteEvent<void>;
 export var Pause: LiteEvent<void>;
@@ -34,6 +36,20 @@ export default class Controls {
                 controlRoot.classList.remove("displayBasedOnTouch")
                 , 5000);
         }, false);
+        
+        // For now we consider a document multimedia if it has either narration or animation.
+        this.multimedia = !!(document.getElementsByClassName("audio-sentence").length
+            || Animation.getAnimationView(document.body));
+        if (this.multimedia) {
+            controlRoot.classList.add("multimedia");
+        }
+        
+        // similarly, we mark the controls if the document has any background music
+        const hasMusic = [].slice.call(document.body.getElementsByClassName("bloom-page"))
+            .find(p => Music.pageHasMusic(p));
+        if (hasMusic) {
+            controlRoot.classList.add("hasMusic");
+        }
 
         ReactDOM.render(
             <div id="controls">
@@ -69,4 +85,10 @@ export default class Controls {
             controlRoot
         );
     }
+    
+    public documentHasMultimedia(): boolean {
+        return this.multimedia;
+    }
+    
+    private multimedia: boolean;
 }

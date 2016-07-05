@@ -13,6 +13,14 @@
             display: block; //show when mouse enters body
         }
     }
+    
+    &:not(.hasMusic) {
+        #musicButton {visibility: hidden}
+    }
+    
+    &:not(.multimedia) {
+        #playAndPauseButton {visibility: hidden }
+    }
 }
 
 //this one is rendered by react
@@ -110,8 +118,6 @@
             width: @playAndPauseButtonSize;
         }
     }
-
-
 
     @ButtonBackground:  transparent;//rgba(0,0,0,.3);
     .button:before{
