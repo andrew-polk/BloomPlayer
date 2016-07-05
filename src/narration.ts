@@ -39,8 +39,34 @@ enum Status {
 class Narration {
 
     public static subscribeEvents() {
-        Play.subscribe( () => Narration.getPlayer().play());
-        Pause.subscribe( () => Narration.getPlayer().pause());
+        Play.subscribe( () => {
+            if (this.segments.length) {
+                Narration.getPlayer().play();
+            }
+            this.paused = false;
+            // adjust startPlay by the elapsed pause. This will cause fakePageNarrationTimedOut to
+            // start a new timeout if we are depending on it to fake PageNarrationComplete.
+            const pause = (new Date().getTime() - this.startPause.getTime());
+            this.startPlay = new Date(this.startPlay.getTime() + pause);
+            //console.log("paused for " + pause + " and adjusted start time to " + this.startPlay);
+            if (this.fakeNarrationAborted) {
+                // we already paused through the timeout for normal advance.
+                // This call (now we are not paused and have adjusted startPlay)
+                // will typically start a new timeout. If we are very close to
+                // the desired duration it may just raise the event at once.
+                // Either way we should get the event raised exactly once
+                // at very close to the right time, allowing for pauses.
+                this.fakeNarrationAborted = false;
+                this.fakePageNarrationTimedOut(this.playerPage);
+            }
+        });
+        Pause.subscribe( () => {
+            if (this.segments.length) {
+                Narration.getPlayer().pause();
+            }
+            this.paused = true;
+            this.startPause = new Date();
+        });
     }
 
     public static playAllSentences(page: HTMLElement): void {
@@ -60,16 +86,21 @@ class Narration {
         this.segments = this.getAudioElements();
         this.pageDuration = 0.0;
         this.segmentIndex = 0;
+        this.startPlay = new Date();
+        //console.log("started play at " + this.startPlay);
+        // in case we are already paused (but did manual advance), start computing
+        // the pause duration from the beginning of this page.
+        this.startPause = this.startPlay;
         if (this.segments.length === 0) {
             PageDuration = 2.0;
             PageDurationAvailable.raise(page);
-            // this was causing page advance from the first page even when paused...
-            // I (JH) couldn't see why it was needed since we also detect the end of actual
-            // narration and then raise thise event.
-            // setTimeout(function() {
-            //     // Arbitrarily raise the event after this delay, so things move on.
-            //     PageNarrationComplete.raise(page);
-            // }, PageDuration * 1000);
+            // Since there is nothing to play, we will never get an 'ended' event
+            // from the player. If we are going to advance pages automatically,
+            // we need to raise PageNarrationComplete some other way.
+            // A timeout allows us to raise it after the arbitrary duration we have
+            // selected. The tricky thing is to allow it to be paused.
+            setTimeout(() => this.fakePageNarrationTimedOut(page), PageDuration * 1000);
+            this.fakeNarrationAborted = false;
             return;
         }
         // trigger first duration evaluation.
@@ -82,7 +113,29 @@ class Narration {
     private static segments: HTMLElement[];
     private static segmentIndex: number;
     private static pageDuration: number;
+    private static paused: boolean = false;
+    // The time we started to play the current page (set in computeDuration, adjusted for pauses)
+    private static startPlay: Date;
+    private static startPause: Date;
+    private static fakeNarrationAborted: boolean = false;
 
+    private static fakePageNarrationTimedOut(page: HTMLElement) {
+        if (this.paused) {
+            this.fakeNarrationAborted = true;
+            return;
+        }
+        // It's possible we experienced one or more pauses and therefore this timeout
+        // happened too soon. In that case, this.startPlay will have been adjusted by
+        // the pauses, so we can detect that here and start a new timeout which will
+        // occur at the appropriately delayed time.
+        const duration = (new Date().getTime() - this.startPlay.getTime()) / 1000;
+        if ( duration < PageDuration - 0.01) {
+            // too soon; try again.
+            setTimeout(() => this.fakePageNarrationTimedOut(page), (PageDuration - duration) * 1000);
+            return;
+        }
+        PageNarrationComplete.raise(page);
+    }
     private static getDurationPlayer(): HTMLMediaElement {
         return this.getAudio("bloom-duration", (audio) => {
             audio.addEventListener("durationchange", (ev) => {
