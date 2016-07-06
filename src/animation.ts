@@ -57,6 +57,7 @@ export default class Animation {
         this.animationView = Animation.getAnimationView(page);
         if (!this.animationView) {return; } // no image to animate
 
+        const _this = this;
         const stylesheet = this.getAnimationStylesheet().sheet;
         const initialRectStr = (<IAnimation> <any> this.animationView.dataset).initialrect;
 
@@ -70,22 +71,6 @@ export default class Animation {
         const finalScaleWidth = 1 / parseFloat(finalRect[2]);
         const finalScaleHeight = 1 / parseFloat(finalRect[3]);
 
-        const initialX = parseFloat(initialRect[0]) * viewWidth;
-        const initialY = parseFloat(initialRect[1]) * viewHeight;
-        const finalX = parseFloat(finalRect[0]) * viewWidth;
-        const finalY = parseFloat(finalRect[1]) * viewHeight;
-
-        // Will take the form of "scale3d(W, H,1.0) translate3d(Xpx, Ypx, 0px)"
-        // Using 3d scale and transform apparently causes GPU to be used and improves
-        // performance over scale/transform. (https://www.kirupa.com/html5/ken_burns_effect_css.htm)
-        // May also help with blurring of material originally hidden.
-        const initialTransform = "scale3d(" + initialScaleWidth + ", " + initialScaleHeight
-            + ", 1.0) translate3d(-" + initialX + "px, -" + initialY + "px, 0px)";
-        const finalTransform = "scale3d(" + finalScaleWidth + ", " + finalScaleHeight
-            + ", 1.0) translate3d(-" + finalX + "px, -" + finalY + "px, 0px)";
-
-        // console.log(initialTransform);
-        // console.log(finalTransform);
         // remove obsolete rules. We want to keep the permanent rules and the ones for the previous page
         // (which may still be visible). That's at most 2. It's harmless to keep an extra one.
         while ((<CSSStyleSheet> stylesheet).cssRules.length > this.permanentRuleCount + 2) {
@@ -121,11 +106,76 @@ export default class Animation {
         const animateStyleName = "bloom-animate" + ruleMod;
         const movePicName = "movepic" + ruleMod;
 
+        let wrapDiv: HTMLElement = null;
+        let initialTransform = "";
+        let finalTransform = "";
+
+        // Figure out the transforms needed to bring about the animation. These are relative to the size of the wrapDiv
+        // which clips the animation, so we can't compute it until we set that size, which in turn sometimes has to
+        // wait until we get the aspect ratio of the image.
+        function updateTransform() {
+            const wrapDivWidth = wrapDiv.clientWidth;
+            const wrapDivHeight = wrapDiv.clientHeight;
+            const initialX = parseFloat(initialRect[0]) * wrapDivWidth;
+            const initialY = parseFloat(initialRect[1]) * wrapDivHeight;
+            const finalX = parseFloat(finalRect[0]) * wrapDivWidth;
+            const finalY = parseFloat(finalRect[1]) * wrapDivHeight;
+
+            // Will take the form of "scale3d(W, H,1.0) translate3d(Xpx, Ypx, 0px)"
+            // Using 3d scale and transform apparently causes GPU to be used and improves
+            // performance over scale/transform. (https://www.kirupa.com/html5/ken_burns_effect_css.htm)
+            // May also help with blurring of material originally hidden.
+            initialTransform = "scale3d(" + initialScaleWidth + ", " + initialScaleHeight
+                + ", 1.0) translate3d(-" + initialX + "px, -" + initialY + "px, 0px)";
+            finalTransform = "scale3d(" + finalScaleWidth + ", " + finalScaleHeight
+                + ", 1.0) translate3d(-" + finalX + "px, -" + finalY + "px, 0px)";
+        }
+
+        // insert the rules that animate the image (or set its state during the page turn animation).
+        // We hope this happens before the image is visible, but we can't do it until we get the aspect
+        // ratio of the image and use it to compute the size of the wrapDiv.
+        function insertAnimationRules() {
+            if (beforeVisible) {
+                // this rule puts it in the initial state for the animation, so we get a smooth
+                // transition when the animation starts. Don't start THIS animation, though,
+                // until the page-turn one completes.
+                (<CSSStyleSheet> stylesheet).insertRule("." + animateStyleName
+                    + " { transform-origin: 0px 0px; transform: "
+                    + initialTransform + ";}", 0);
+            } else {
+                //Insert the keyframe animation rule with the dynamic begin and end set
+                // The wrapDiv will always have been created during the beforeVisible pass, so we can
+                // assume we don't have to wait for it.
+                if (waitingForWrapDivWidth) {
+                    alert("unexpectedly did not have a wrap div");
+                }
+                (<CSSStyleSheet> stylesheet).insertRule("@keyframes " + movePicName
+                    + " { from{ transform-origin: 0px 0px; transform: " + initialTransform
+                    + "; } to{ transform-origin: 0px 0px; transform: " + finalTransform + "; } }", 0);
+
+                //Insert the css for the imageView div that utilizes the newly created animation
+                (<CSSStyleSheet> stylesheet).insertRule("." + animateStyleName
+                    + " { transform-origin: 0px 0px; transform: "
+                    + initialTransform
+                    + "; animation-name: " + movePicName + "; animation-duration: "
+                    + PageDuration + "s; animation-fill-mode: forwards; }", 1);
+                // Remove the rule inserted by the beforeVisible event (but not any permanent rules).
+                // Enhance: can we more reliably remove what and only what beforeVisible added, e.g.
+                // by looking for all rules that apply to animateStyleName?
+                // Note that we want to remove this only AFTER inserting the rules above, otherwise,
+                // we get a flash of the full-size picture in the instant  when no rules apply.
+                if ((<CSSStyleSheet> stylesheet).cssRules.length > _this.permanentRuleCount + 2) {
+                    (<CSSStyleSheet> stylesheet).removeRule(2);
+                }
+            }
+        }
+
+        let waitingForWrapDivWidth = false;
+
         if (this.animationView.children.length !== 1
             || !this.hasClass(<HTMLElement> this.animationView.firstChild, wrapperClassName)) {
 
-            const wrapDiv = document.createElement("div");
-            this.animationView.appendChild(wrapDiv);
+            wrapDiv = document.createElement("div");
             this.addClass(wrapDiv, wrapperClassName);
             const movingDiv = document.createElement("div");
             wrapDiv.appendChild(movingDiv);
@@ -145,6 +195,7 @@ export default class Animation {
                         + "px; top: " + (viewHeight - imageHeight) / 2  + "px");
                 }
             }
+
             const styleData = this.animationView.getAttribute("style");
             if (styleData) {
                 // This somewhat assumes the ONLY style attribute is the background image.
@@ -153,47 +204,42 @@ export default class Animation {
                 movingDiv.setAttribute("style", styleData);
                 const imageSrc = styleData.replace(/.*url\((['"])([^)]*)\1\).*/i, "$2");
                 const image = new Image();
+                waitingForWrapDivWidth = true; // can't insert any rules until we get width
                 image.addEventListener("load", () => {
                     if (image.height) {  // some browsers may not produce this?
                         imageAspectRatio = image.width / image.height;
                         updateWrapDivSize();
+                        updateTransform();
+                        insertAnimationRules();
                     }
                 });
                 image.src = imageSrc;
             } else {
+                // Enhance: if the original div had content (typically an <img>), 
+                // try to use its image to figure aspect ratio
                 updateWrapDivSize(); // just do it with the ratio we guessed.
+                updateTransform();
             }
 
-            // Todo: if the original div had content (typically an <img>), move it
-            // (and try to use its image to figure aspect ratio)
             // Give this rule the class bloom-animate to trigger the rule created in getAnimationStylesheet,
             // and bloom-animationN to trigger the one we are about to create for page-specific animation.
             movingDiv.setAttribute("class", "bloom-animate " + animateStyleName);
+            // If the animation view had content (typically an img), move it to the inner div
+            while (this.animationView.childNodes.length) {
+                movingDiv.appendChild(this.animationView.childNodes[0]);
+            }
+            this.animationView.appendChild(wrapDiv);
+        } else {
+            wrapDiv = <HTMLElement> this.animationView.children.item(0);
+            // Enhance: possibly we should remember the aspect ratio we want and update its size
+            // here in case the containing window size has changed.
+            updateTransform();
         }
 
-        if (beforeVisible) {
-            // this rule puts it in the initial state for the animation, so we get a smooth
-            // transition when the animation starts. Don't start THIS animation, though,
-            // until the page-turn one completes.
-            (<CSSStyleSheet> stylesheet).insertRule("." + animateStyleName + " { transform-origin: 0px 0px; transform: "
-                 + initialTransform + ";}", 0);
-        } else {
-            // Remove the rule inserted by the beforeVisible event (but not any permanent rules).
-            // Enhance: can we more reliably remove what and only what beforeVisible added, e.g.
-            // by looking for all rules that apply to animateStyleName?
-            if ((<CSSStyleSheet> stylesheet).cssRules.length > this.permanentRuleCount) {
-                (<CSSStyleSheet> stylesheet).removeRule(0);
-            }
-            //Insert the keyframe animation rule with the dynamic begin and end set
-            (<CSSStyleSheet> stylesheet).insertRule("@keyframes " + movePicName
-                + " { from{ transform-origin: 0px 0px; transform: " + initialTransform
-                + "; } to{ transform-origin: 0px 0px; transform: " + finalTransform + "; } }", 0);
-
-            //Insert the css for the imageView div that utilizes the newly created animation
-            (<CSSStyleSheet> stylesheet).insertRule("." + animateStyleName + " { transform-origin: 0px 0px; transform: "
-                + initialTransform
-                + "; animation-name: " + movePicName + "; animation-duration: "
-                + PageDuration + "s; animation-fill-mode: forwards; }", 1);
+        // console.log(initialTransform);
+        // console.log(finalTransform);
+        if (!waitingForWrapDivWidth) {
+            insertAnimationRules();
         }
     }
 
