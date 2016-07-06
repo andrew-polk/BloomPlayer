@@ -57,7 +57,7 @@ export default class Animation {
         this.animationView = Animation.getAnimationView(page);
         if (!this.animationView) {return; } // no image to animate
 
-        const _this = this;
+        const outerThis = this;
         const stylesheet = this.getAnimationStylesheet().sheet;
         const initialRectStr = (<IAnimation> <any> this.animationView.dataset).initialrect;
 
@@ -164,7 +164,7 @@ export default class Animation {
                 // by looking for all rules that apply to animateStyleName?
                 // Note that we want to remove this only AFTER inserting the rules above, otherwise,
                 // we get a flash of the full-size picture in the instant  when no rules apply.
-                if ((<CSSStyleSheet> stylesheet).cssRules.length > _this.permanentRuleCount + 2) {
+                if ((<CSSStyleSheet> stylesheet).cssRules.length > outerThis.permanentRuleCount + 2) {
                     (<CSSStyleSheet> stylesheet).removeRule(2);
                 }
             }
@@ -179,19 +179,22 @@ export default class Animation {
             this.addClass(wrapDiv, wrapperClassName);
             const movingDiv = document.createElement("div");
             wrapDiv.appendChild(movingDiv);
+            // hide it until we can set its size and the transform rule for its child properly.
+            wrapDiv.setAttribute("style", "visibility: hidden;");
             let imageAspectRatio = 4 / 3; // default in case we're not using background image
             const viewAspectRatio = viewWidth / viewHeight;
 
             function updateWrapDivSize() {
+                const oldStyle = wrapDiv.getAttribute("style"); // may have visibility:hidden
                 if (imageAspectRatio < viewAspectRatio) {
                     // black bars on side
                     const imageWidth = viewHeight * imageAspectRatio;
-                    wrapDiv.setAttribute("style", "height: 100%; width: " + imageWidth
+                    wrapDiv.setAttribute("style", oldStyle + " height: 100%; width: " + imageWidth
                         + "px; left: " + (viewWidth - imageWidth) / 2  + "px");
                 } else {
                     // black bars top and bottom
                     const imageHeight = viewWidth / imageAspectRatio;
-                    wrapDiv.setAttribute("style", "width: 100%; height: " + imageHeight
+                    wrapDiv.setAttribute("style", oldStyle + " width: 100%; height: " + imageHeight
                         + "px; top: " + (viewHeight - imageHeight) / 2  + "px");
                 }
             }
@@ -211,6 +214,9 @@ export default class Animation {
                         updateWrapDivSize();
                         updateTransform();
                         insertAnimationRules();
+                        const oldStyle = wrapDiv.getAttribute("style");
+                         // now we can show it.
+                        wrapDiv.setAttribute("style", oldStyle.substring("visibility: hidden; ".length));
                     }
                 });
                 image.src = imageSrc;
