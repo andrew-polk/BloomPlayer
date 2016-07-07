@@ -56,17 +56,24 @@ export class Music {
         this.getPlayer().play();
     }
 
-    private getPlayer(): HTMLMediaElement {
-         let player = document.querySelector("#music-player");
+    private getPlayer(): HTMLAudioElement {
+         let player = <HTMLAudioElement> document.querySelector("#music-player");
          if (!player) {
-             player = document.createElement("audio");
+             player = <HTMLAudioElement> document.createElement("audio");
+             let volume = this.playerPage.attributes["data-backgroundaudiovolume"];
+             if (volume && volume.value) {
+                player.volume = volume.value;
+             } else {
+                player.volume = 1;
+             }
+
              player.setAttribute("id", "music-player");
              document.body.appendChild(player);
 
              // if we just pass the function, it has the wrong "this"
              player.addEventListener("ended", () => this.playEnded());
          }
-         return <HTMLMediaElement> player;
+         return <HTMLAudioElement> player;
     }
 
     // Gecko has no way of knowing that we've created or modified the audio file,
