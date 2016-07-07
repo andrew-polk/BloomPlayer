@@ -232,7 +232,7 @@ class Narration {
     }
 
     private static currentAudioUrl(id: string): string {
-        return "audio/" + id + ".wav";
+        return "audio/" + id + ".ogg";
     }
 
     private static setStatus(which: string, to: Status): void {
