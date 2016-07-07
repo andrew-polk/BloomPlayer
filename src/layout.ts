@@ -24,10 +24,10 @@ export function Scale(): number {
     if (!pageWidth) {
         debugger;
     }
-    //TODO: I suspect this equation is off, or rounding the wrong way, or not taking
-    //consideration of scroll bar, or border of the navigation or carousel containers, something.
-    //this 15 is a temporary fudge, roughly the scrollbar width
-    return Math.min((window.innerWidth ) / pageWidth, (window.innerHeight ) / pageHeight);
+    //using "self" here, instead of "window", makes it get the dimension of the enclosing iframe when
+    //we are running in a frame instead of getting the whole windows (e.g. intel xdk "emulator" (which
+    //is nothing of the sort... according to intel docs, it's just an iframe in web-kit) )
+    return Math.min((self.innerWidth ) / pageWidth, (self.innerHeight ) / pageHeight);
 }
 
 function adjust() {
