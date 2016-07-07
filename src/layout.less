@@ -46,3 +46,16 @@ body{
 .numberedPage:after{
   content: '' !important;
 }
+
+.Device16x9Landscape .marginBox {
+    background-color: black;
+
+    .split-pane.horizontal-percent > .split-pane-component.position-top{
+        margin-bottom: 0;
+    }
+
+    .bloom-imageContainer{
+        //the basePage.css has a "- 3px" that leaves the bottom of the screen unused
+        height: calc(100%) !important;
+    }
+}
