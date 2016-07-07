@@ -35,7 +35,7 @@ function attach() {
                 }
             });
         }
-    }, 0);
+    }, 100); // increase this number of doing source-level debugging an a breakpoint early in this method isn't being hit
 }
 
 function setUpDomForPlaying() {
