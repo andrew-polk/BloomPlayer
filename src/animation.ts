@@ -158,7 +158,8 @@ export default class Animation {
                     + " { transform-origin: 0px 0px; transform: "
                     + initialTransform
                     + "; animation-name: " + movePicName + "; animation-duration: "
-                    + PageDuration + "s; animation-fill-mode: forwards; }", 1);
+                    + PageDuration + "s; animation-fill-mode: forwards; "
+                    + "animation-timing-function: linear;}", 1);
                 // Remove the rule inserted by the beforeVisible event (but not any permanent rules).
                 // Enhance: can we more reliably remove what and only what beforeVisible added, e.g.
                 // by looking for all rules that apply to animateStyleName?
