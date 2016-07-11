@@ -55,6 +55,9 @@ export class Music {
     }
 
     public listen(page: HTMLElement): void {
+        if (!page) {
+            alert("page was null");
+        }
         const wasPaused = this.haveStartedMusic && this.getPlayer().paused;
         this.playerPage = page;
         this.setAudioSource();
@@ -74,13 +77,17 @@ export class Music {
          let player = <HTMLAudioElement> document.querySelector("#music-player");
          if (!player) {
              player = <HTMLAudioElement> document.createElement("audio");
-             let volume = this.playerPage.attributes["data-backgroundaudiovolume"];
-             if (volume && volume.value) {
-                player.volume = volume.value;
+             if (!this.playerPage) {
+                 console.log("Musci:getPlayer() called when playerPage wasn't set.");
+                 player.volume = 1;
              } else {
-                player.volume = 1;
-             }
-
+                let volume = this.playerPage.attributes["data-backgroundaudiovolume"];
+                if (volume && volume.value) {
+                    player.volume = volume.value;
+                } else {
+                    player.volume = 1;
+                }
+            }
              player.setAttribute("id", "music-player");
              document.body.appendChild(player);
 
