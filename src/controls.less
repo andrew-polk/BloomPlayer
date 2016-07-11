@@ -4,20 +4,24 @@
     position: absolute;
     z-index: 20000;
     width: 100%;
-
     div{
-        display: none; // normally, hide
+        transition: opacity .5s;
+        transition-timing-function: linear;
+        transition-delay: 0s;
+    }
+    div{
+        opacity: 0; // normally, hide
     }
     &.displayBasedOnTouch, body:hover &:not(.touchCapabilityDetected){
         div {
-            display: block; //show when mouse enters body
+            opacity: 1; ///show when mouse enters body
         }
     }
-    
+
     &:not(.hasMusic) {
         #musicButton {visibility: hidden}
     }
-    
+
     &:not(.multimedia) {
         #playAndPauseButton {visibility: hidden }
     }
@@ -132,7 +136,6 @@
         background-repeat: no-repeat;
         //display: none;
         //opacity: .7;
-        transition: all 1s;
         // border-style: solid;
         // border: solid @ButtonBackground;
         // border-width: 36px; // this serves to control the size of the background around the button's icon
@@ -140,8 +143,4 @@
     }
 }
 
-
-body:hover .overlay{
-    display: block !important;
-}
 
