@@ -29,6 +29,12 @@ export class Music {
         ToggleMusic = new LiteEvent<HTMLElement>();
 
         ToggleMusic.subscribe(() => {
+            if (!this.playerPage) {
+                 // no music listen in progress; and we don't want to try to
+                 // initialize the player while we don't have a page that
+                 // has music from which to try to get the music volume.
+                return;
+            }
             if (this.getPlayer().paused) {
                 this.getPlayer().play();
             } else {
@@ -36,8 +42,16 @@ export class Music {
             }
         });
 
-        Play.subscribe( () => this.getPlayer().play());
-        Pause.subscribe( () => {this.getPlayer().pause(); });
+        Play.subscribe( () => {
+            if (this.playerPage) { // if not we aren't listening and can't getPlayer.
+                this.getPlayer().play();
+            }
+         });
+        Pause.subscribe( () => {
+            if (this.playerPage) { // if not we aren't listening and can't getPlayer.
+                this.getPlayer().pause();
+            }
+        });
     }
 
     public listen(page: HTMLElement): void {
