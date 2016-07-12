@@ -1,6 +1,6 @@
 /// <reference path="../typings/index.d.ts" />
 
-import {SetupLayout} from "./layout";
+import {SetupLayout, SetupLayoutEvents} from "./layout";
 import Animation from "./animation";
 import {SetupMusic} from "./music";
 import {SetupNarration, SetupNarrationEvents, PageNarrationComplete} from "./narration";
@@ -22,7 +22,7 @@ function attach() {
         animation = new Animation();
         SetupMusic();
         SetupNarration();
-
+        SetupLayoutEvents();
         (<any> window).navigation.showFirstPage();
 
         //nav.GotoFirstPage(); // now go to first page again so that all the fancy stuff gets triggered

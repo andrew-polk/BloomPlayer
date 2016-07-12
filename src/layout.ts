@@ -1,4 +1,5 @@
 import "./layout.less";
+import {PageVisible, PageHidden} from "./navigation";
 
 // "Layout" here is the task of fitting the material to the device
 // and orientation.
@@ -13,6 +14,17 @@ export function SetupLayout() {
     window.addEventListener("resize", () => window.setTimeout( adjust, 500));
     window.addEventListener("orientationchange", () => window.setTimeout( adjust, 500));
     window.addEventListener("orientationchange", setOrientation);
+}
+
+export function SetupLayoutEvents() {
+    PageVisible.subscribe( (page) => {
+        window.setTimeout(function() {
+            page.classList.add("showDisplayEffect"); //cause title to fade in
+        }, 0);
+    });
+    PageHidden.subscribe( (page) => {
+        page.classList.remove("showDisplayEffect"); //so it's ready if we show this page again
+    });
 }
 
 export function Scale(): number {
