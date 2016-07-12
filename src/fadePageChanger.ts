@@ -44,7 +44,8 @@ export default class FadePageChanger implements IPageChanger {
             PageBeforeVisible.raise(targetPage);
 
             //at the end of the transition, clean things up
-            const transitionMilliseconds = 500;
+            // this number must match what is in the stylesheet for opacity transition
+            const transitionMilliseconds = 1000; //500;
             window.setTimeout(() => {
                         this.pageBeingHidden.classList.remove("currentPage");
                         this.pageBeingHidden.style.opacity = ""; //reset it
@@ -59,7 +60,7 @@ export default class FadePageChanger implements IPageChanger {
 
         } else {
             // wrap around //TODO remove this when we can disable the "next button" on the last page
-            this.showFirstPage();
+            //this.showFirstPage();
         }
     }
 

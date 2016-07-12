@@ -43,8 +43,8 @@
             //  "runtimeExecutable": "c:/Program Files (x86)/Google/Chrome/Application/chrome.exe",
             //  "runtimeArgs": [ "--remote-debugging-port=9222 --incognito" ],
 
-            //"url": "http://localhost:3030",
-            "url" : "${workspaceRoot}/output/index.html",
+            "url": "http://localhost:3030",
+            //"url" : "${workspaceRoot}/output/index.html",
             "webRoot": "${workspaceRoot}",
             "sourceMaps": true,
             "userDataDir": "${workspaceRoot}/output/chrome"

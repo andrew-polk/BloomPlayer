@@ -46,7 +46,12 @@ export default class Navigation {
     }
 
     public  gotoNextPage(): void {
-         this.pageChanger.transitionPage(this.currentPage().nextElementSibling  as HTMLElement, true);
+        const next = this.currentPage().nextElementSibling  as HTMLElement;
+        if (next) {
+            this.pageChanger.transitionPage(next, true);
+        } else {
+            this.showFirstPage();
+        }
     }
 
     public  gotoPreviousPage(): void {

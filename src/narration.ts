@@ -92,7 +92,7 @@ class Narration {
         // the pause duration from the beginning of this page.
         this.startPause = this.startPlay;
         if (this.segments.length === 0) {
-            PageDuration = 2.0;
+            PageDuration = 3.0;
             PageDurationAvailable.raise(page);
             // Since there is nothing to play, we will never get an 'ended' event
             // from the player. If we are going to advance pages automatically,
@@ -163,8 +163,8 @@ class Narration {
             this.getDurationPlayer().setAttribute("src",
                 this.currentAudioUrl(this.segments[this.segmentIndex].getAttribute("id")));
         } else {
-            if (this.pageDuration < 1.0) {
-                this.pageDuration = 1.0; // maybe too small?
+            if (this.pageDuration < 3.0) {
+                this.pageDuration = 3.0;
             }
             PageDuration = this.pageDuration;
             PageDurationAvailable.raise(this.playerPage);

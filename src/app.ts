@@ -12,8 +12,18 @@ let animation: Animation;
 let controls: Controls;
 
 function attach() {
+     if (document.getElementById("root")) {
+        // this is not being called (that's good)
+        console.log("mystery second call of attach");
+        return;
+     }
     // this slight delay makes it possible to catch breakpoints in vscode even for things that happen right away.
-    window.setTimeout(() => {
+     window.setTimeout( () => {
+        if (document.getElementById("root")) {
+            // this is being called (that's bad)
+            console.log("mystery second call of attach.timeout");
+            return;
+        }
         SetupLayout();
 
         setUpDomForPlaying();
