@@ -85,7 +85,7 @@ class Narration {
         this.playerPage = page;
         this.segments = this.getAudioElements();
         this.pageDuration = 0.0;
-        this.segmentIndex = 0;
+        this.segmentIndex = -1; // so pre-increment in getNextSegment sets to 0.
         this.startPlay = new Date();
         //console.log("started play at " + this.startPlay);
         // in case we are already paused (but did manual advance), start computing
@@ -103,8 +103,9 @@ class Narration {
             this.fakeNarrationAborted = false;
             return;
         }
-        // trigger first duration evaluation.
-        this.getDurationPlayer().setAttribute("src", this.currentAudioUrl(this.segments[0].getAttribute("id")));
+        // trigger first duration evaluation. Each triggers another until we have them all.
+        this.getNextSegment();
+        //this.getDurationPlayer().setAttribute("src", this.currentAudioUrl(this.segments[0].getAttribute("id")));
     }
 
     private static playerPage: HTMLElement;
@@ -151,6 +152,14 @@ class Narration {
     private static getNextSegment() {
         this.segmentIndex++;
         if (this.segmentIndex < this.segments.length) {
+            const attrDuration = this.segments[this.segmentIndex].getAttribute("data-duration");
+            if (attrDuration) {
+                // precomputed duration available, use it and go on.
+                this.pageDuration += parseFloat(attrDuration);
+                this.segmentIndex++;
+                this.getNextSegment();
+                return;
+            }
             this.getDurationPlayer().setAttribute("src",
                 this.currentAudioUrl(this.segments[this.segmentIndex].getAttribute("id")));
         } else {
@@ -232,7 +241,7 @@ class Narration {
     }
 
     private static currentAudioUrl(id: string): string {
-        return "audio/" + id + ".ogg";
+        return "audio/" + id + ".mp3";
     }
 
     private static setStatus(which: string, to: Status): void {
