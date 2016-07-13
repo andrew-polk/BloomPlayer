@@ -37,7 +37,7 @@ export default class Animation {
         Play.subscribe( () =>  {
             if (this.animationView) {
                 const stylesheet = this.getAnimationStylesheet().sheet;
-                (<CSSStyleSheet> stylesheet).removeRule((<CSSStyleSheet> stylesheet).cssRules.length - 1);
+                (<CSSStyleSheet> stylesheet).deleteRule((<CSSStyleSheet> stylesheet).cssRules.length - 1);
                 this.permanentRuleCount--;
             }
         });
@@ -75,7 +75,7 @@ export default class Animation {
         // (which may still be visible). That's at most 2. It's harmless to keep an extra one.
         while ((<CSSStyleSheet> stylesheet).cssRules.length > this.permanentRuleCount + 2) {
             // remove the last (oldest, since we add at start) non-permanent rule
-            (<CSSStyleSheet> stylesheet).removeRule((<CSSStyleSheet> stylesheet).cssRules.length
+            (<CSSStyleSheet> stylesheet).deleteRule((<CSSStyleSheet> stylesheet).cssRules.length
                 - this.permanentRuleCount - 1);
         }
         // We expect to see something like this:
@@ -125,10 +125,10 @@ export default class Animation {
             // Using 3d scale and transform apparently causes GPU to be used and improves
             // performance over scale/transform. (https://www.kirupa.com/html5/ken_burns_effect_css.htm)
             // May also help with blurring of material originally hidden.
-            initialTransform = "scale3d(" + initialScaleWidth + ", " + initialScaleHeight
-                + ", 1.0) translate3d(-" + initialX + "px, -" + initialY + "px, 0px)";
-            finalTransform = "scale3d(" + finalScaleWidth + ", " + finalScaleHeight
-                + ", 1.0) translate3d(-" + finalX + "px, -" + finalY + "px, 0px)";
+            initialTransform = "scale3d(" + initialScaleWidth + ", " + initialScaleWidth
+                + ", " + initialScaleWidth + ") translate3d(-" + initialX + "px, -" + initialY + "px, 0px)";
+            finalTransform = "scale3d(" + finalScaleWidth + ", " + finalScaleWidth
+                + ", " + finalScaleWidth + ") translate3d(-" + finalX + "px, -" + finalY + "px, 0px)";
         }
 
         // insert the rules that animate the image (or set its state during the page turn animation).
@@ -166,7 +166,7 @@ export default class Animation {
                 // Note that we want to remove this only AFTER inserting the rules above, otherwise,
                 // we get a flash of the full-size picture in the instant  when no rules apply.
                 if ((<CSSStyleSheet> stylesheet).cssRules.length > outerThis.permanentRuleCount + 2) {
-                    (<CSSStyleSheet> stylesheet).removeRule(2);
+                    (<CSSStyleSheet> stylesheet).deleteRule(2);
                 }
             }
         }
