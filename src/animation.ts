@@ -8,6 +8,10 @@ interface IAnimation { initialrect: string;  finalrect: string; }
 
 export default class Animation {
 
+    public static documentHasAnimation(): boolean {
+        return !!Animation.getAnimationView(document.body);
+    }
+
     public static getAnimationView(parent: HTMLElement): HTMLElement {
         return <HTMLElement> ([].slice.call(parent.getElementsByClassName("bloom-imageContainer"))
             .find(v => (<IAnimation> v.dataset).initialrect));

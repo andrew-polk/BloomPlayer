@@ -36,7 +36,11 @@ enum Status {
     Active // Button now active (Play while playing; Record while held down)
 };
 
-class Narration {
+export class Narration {
+
+    public static documentHasNarration(): boolean {
+        return !!document.getElementsByClassName("audio-sentence").length;
+    }
 
     public static subscribeEvents() {
         Play.subscribe( () => {

@@ -10,6 +10,10 @@ export function SetupMusic() {
 }
 export class Music {
 
+    public static documentHasMusic(): boolean {
+        return [].slice.call(document.body.getElementsByClassName("bloom-page")).find(p => Music.pageHasMusic(p));
+    }
+
     public static pageHasMusic(page: HTMLElement): boolean {
         return page.attributes["data-backgroundaudio"];
     }
