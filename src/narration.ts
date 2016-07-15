@@ -141,17 +141,17 @@ export default class Narration {
         }
         PageNarrationComplete.raise(page);
     }
-    private static getDurationPlayer(): HTMLMediaElement {
-        return this.getAudio("bloom-duration", (audio) => {
-            audio.addEventListener("durationchange", (ev) => {
-                this.pageDuration += audio.duration;
-                this.getNextSegment();
-            });
-            audio.addEventListener("error", (ev) => {
-                this.getNextSegment(); // can't get a length for this segment, move on.
-            });
-        });
-    }
+    // private static getDurationPlayer(): HTMLMediaElement {
+    //     return this.getAudio("bloom-duration", (audio) => {
+    //         audio.addEventListener("durationchange", (ev) => {
+    //             this.pageDuration += audio.duration;
+    //             this.getNextSegment();
+    //         });
+    //         audio.addEventListener("error", (ev) => {
+    //             this.getNextSegment(); // can't get a length for this segment, move on.
+    //         });
+    //     });
+    // }
 
     private static getNextSegment() {
         this.segmentIndex++;
@@ -164,8 +164,12 @@ export default class Narration {
                 this.getNextSegment();
                 return;
             }
-            this.getDurationPlayer().setAttribute("src",
-                this.currentAudioUrl(this.segments[this.segmentIndex].getAttribute("id")));
+            // Replace this with the commented code to have ask the browser for duration.
+            // (Also uncomment the getDurationPlayer method)
+            // However, this doesn't work in apps.
+            this.getNextSegment();
+            // this.getDurationPlayer().setAttribute("src",
+            //     this.currentAudioUrl(this.segments[this.segmentIndex].getAttribute("id")));
         } else {
             if (this.pageDuration < 3.0) {
                 this.pageDuration = 3.0;
