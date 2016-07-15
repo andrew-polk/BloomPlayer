@@ -45,8 +45,11 @@ export default class Controls {
         }
 
         // similarly, we mark the controls if the document has any background music
+        var musicButton;
         if (Music.documentHasMusic()) {
             controlRoot.classList.add("hasMusic");
+            musicButton = (<div id="musicButton" className="button"
+                            onClick={() => ToggleMusic.raise() }/>);
         }
 
         ReactDOM.render(
@@ -54,8 +57,7 @@ export default class Controls {
                 <div id="toolbar">
                     <div id="homeButton" className="button"
                         onClick={() => this.navigation.showFirstPage() }/>
-                    <div id="musicButton" className="button"
-                        onClick={() => ToggleMusic.raise() }/>
+                    {musicButton}
                     {/* <div id="narrationButton" className="button"
                         onClick={() => alert("will someday toggle narration")}/> */}
                     <div id="bloomButton" className="button"
