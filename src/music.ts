@@ -8,7 +8,7 @@ let music: Music;
 export function SetupMusic() {
     music = new Music();
 }
-export class Music {
+export default class Music {
 
     public static documentHasMusic(): boolean {
         return [].slice.call(document.body.getElementsByClassName("bloom-page")).find(p => Music.pageHasMusic(p));

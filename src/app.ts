@@ -7,6 +7,7 @@ import {SetupNarration, SetupNarrationEvents, PageNarrationComplete} from "./nar
 import Controls from "./controls";
 import Navigation, {GoNextPage} from "./navigation";
 import {Scale} from "./layout";
+import Multimedia from "./multimedia";
 
 let animation: Animation;
 let controls: Controls;
@@ -38,7 +39,7 @@ function attach() {
         //nav.GotoFirstPage(); // now go to first page again so that all the fancy stuff gets triggered
 
         //commented out because we are getting these events even if there is no narration.
-        if (controls.documentHasMultimedia()) {
+        if (Multimedia.documentHasMultimedia()) {
             PageNarrationComplete.subscribe(page => {
                 if (page === (<any> window).navigation.currentPage()) {
                     GoNextPage.raise();

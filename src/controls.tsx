@@ -6,8 +6,9 @@ import "./controls.less";
 import {ToggleMusic} from "./music";
 import LiteEvent from "./event";
 import Animation from "./animation";
-import {Music} from "./music";
-import {Narration} from "./narration";
+import Music from "./music";
+import Narration from "./narration";
+import Multimedia from "./multimedia";
 
 export var Play: LiteEvent<void>;
 export var Pause: LiteEvent<void>;
@@ -39,8 +40,7 @@ export default class Controls {
         }, false);
 
         // For now we consider a document multimedia if it has either narration or animation.
-        this.multimedia = Narration.documentHasNarration() || Animation.documentHasAnimation();
-        if (this.multimedia) {
+        if (Multimedia.documentHasMultimedia()) {
             controlRoot.classList.add("multimedia");
         }
 
@@ -85,10 +85,4 @@ export default class Controls {
             controlRoot
         );
     }
-
-    public documentHasMultimedia(): boolean {
-        return this.multimedia;
-    }
-
-    private multimedia: boolean;
 }

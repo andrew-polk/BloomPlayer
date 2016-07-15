@@ -36,7 +36,7 @@ enum Status {
     Active // Button now active (Play while playing; Record while held down)
 };
 
-export class Narration {
+export default class Narration {
 
     public static documentHasNarration(): boolean {
         return !!document.getElementsByClassName("audio-sentence").length;

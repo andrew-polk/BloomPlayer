@@ -42,6 +42,10 @@ export function Scale(): number {
     return Math.min((self.innerWidth ) / pageWidth, (self.innerHeight ) / pageHeight);
 }
 
+export function IsLandscape() {
+    return (<any> window.screen).orientation.type.indexOf("landscape") > -1;
+}
+
 function adjust() {
     console.log("adjusting");
 
@@ -52,26 +56,26 @@ function adjust() {
 }
 
 function setOrientation() {
-     console.log("changing orientation");
-     const pages = document.querySelectorAll(".bloom-page");
-     for (let index = 0; index < pages.length; index++) {
-         const page = pages[index];
+    console.log("changing orientation");
+    const pages = document.querySelectorAll(".bloom-page");
+    for (let index = 0; index < pages.length; index++) {
+        const page = pages[index];
 
-         //remove existing orientation class
-         for (let i = 0; i < page.classList.length; i++) {
-             const classname = page.classList[i];
-             if (classname.indexOf("Portrait") > -1 || classname.indexOf("Landscape") > -1 ) {
-                 page.className = page.className.replace(classname, "");
-             }
-         }
+        //remove existing orientation class
+        for (let i = 0; i < page.classList.length; i++) {
+            const classname = page.classList[i];
+            if (classname.indexOf("Portrait") > -1 || classname.indexOf("Landscape") > -1 ) {
+                page.className = page.className.replace(classname, "");
+            }
+        }
 
-         //note: both FF and Chrome always report "landscape" on desktops
-         //(unless you're in Chrome's Device Toolbar mode)
-         //add in the class we want
-         if ((<any> window.screen).orientation.type.indexOf("landscape") > -1) {
+        //note: both FF and Chrome always report "landscape" on desktops
+        //(unless you're in Chrome's Device Toolbar mode)
+        //add in the class we want
+        if (IsLandscape()) {
             page.classList.add("Device16x9Landscape");
-         } else {
+        } else {
             page.classList.add("Device16x9Portrait");
-         }
-     }
+        }
+    }
 }

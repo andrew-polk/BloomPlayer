@@ -1,8 +1,10 @@
 import "./controls.less";
 import LiteEvent from "./event";
-//import CarouselPageChanger from "./CarouselPageChanger";
+import CarouselPageChanger from "./CarouselPageChanger";
 import FadePageChanger from "./fadePageChanger";
 import {IPageChanger} from "./IPageChanger";
+import {IsLandscape} from "./layout";
+import Multimedia from "./multimedia";
 
 export var PageVisible: LiteEvent<HTMLElement>;
 export var PageBeforeVisible: LiteEvent<HTMLElement>;
@@ -15,22 +17,31 @@ export var GoNextPage: LiteEvent<void>;
 // this book will use and manages that system.
 export default class Navigation {
 
+    private parent: HTMLElement;
     private pageChanger: IPageChanger;
 
     public constructor(parent: HTMLElement) {
-            PageVisible = new LiteEvent<HTMLElement>();
-            PageBeforeVisible = new LiteEvent<HTMLElement>();
-            PageHidden = new LiteEvent<HTMLElement>();
-            GoNextPage = new LiteEvent<void>();
-            GoNextPage.subscribe( () => this.gotoNextPage());
+        this.parent = parent;
 
-            this.setupViewerWrapper(parent);
-            this.pageChanger = new FadePageChanger(parent);
-            // TODO: Use the carousel changer one for normal books
-            // this.pageChanger = new CarouselPageChanger(parent);
+        PageVisible = new LiteEvent<HTMLElement>();
+        PageBeforeVisible = new LiteEvent<HTMLElement>();
+        PageHidden = new LiteEvent<HTMLElement>();
+        GoNextPage = new LiteEvent<void>();
+        GoNextPage.subscribe( () => this.gotoNextPage());
+
+        this.setupViewerWrapper(parent);
+    }
+
+    public setPageChangerForDocument() {
+        if (Multimedia.documentHasMultimedia() && IsLandscape()) {
+            this.pageChanger = new FadePageChanger(this.parent);
+        } else {
+            this.pageChanger = new CarouselPageChanger(this.parent);
+        }
     }
 
     public showFirstPage() {
+        this.setPageChangerForDocument();
         [].forEach.call(document.body.querySelectorAll(".bloom-page"), function(page){
                 page.classList.remove("currentPage");
             });
