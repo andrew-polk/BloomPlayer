@@ -82,7 +82,7 @@ export default class Music {
          if (!player) {
              player = <HTMLAudioElement> document.createElement("audio");
              if (!this.playerPage) {
-                 console.log("Musci:getPlayer() called when playerPage wasn't set.");
+                 console.log("Music:getPlayer() called when playerPage wasn't set.");
                  player.volume = 1;
              } else {
                 let volume = this.playerPage.attributes["data-backgroundaudiovolume"];
@@ -107,7 +107,7 @@ export default class Music {
     // based on the current time so that it asks the server for the file again.
     private setAudioSource(): void {
         let player  = this.getPlayer();
-        player.setAttribute("src", this.playerPage.attributes["data-backgroundaudio"].value +
+        player.setAttribute("src", "audio/" + this.playerPage.attributes["data-backgroundaudio"].value +
          "?nocache=" + new Date().getTime());
     }
 
