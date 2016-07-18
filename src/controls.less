@@ -1,3 +1,5 @@
+@grey: #4d4d4d;
+
 #control-root{
     background-color: rgba(210, 15, 15, 0);
     height: 100%;
@@ -49,21 +51,21 @@
             background-size: contain;
         }
 
-    #homeButton{
-        background-image: url('../assets/home.svg');
-        margin-right: auto;
-        // position: absolute;
-        // top: @Margin;
-        // left: @Margin;
-        // background-size: contain;
-        // //NB: Chrome & FF handle this image scaling differently
-        // height: 3.7em;
-        // width: 5em;
-        //align-self: flex-start;
-    }
-    #narrationButton,   #bloomButton,  #musicButton{
-        width:4em;
-    }
+        #homeButton{
+            background-image: url('../assets/home.svg');
+            margin-right: auto;
+            // position: absolute;
+            // top: @Margin;
+            // left: @Margin;
+            // background-size: contain;
+            // //NB: Chrome & FF handle this image scaling differently
+            // height: 3.7em;
+            // width: 5em;
+            //align-self: flex-start;
+        }
+        #narrationButton,   #bloomButton,  #musicButton{
+            width:4em;
+        }
         #narrationButton,   #bloomButton{
             margin-left: 20px;
         }
@@ -72,6 +74,9 @@
         }
         #musicButton{
             background-image: url('../assets/music.svg');
+            &.off {
+                background-image: url('../assets/music-disabled.svg');
+            }
         }
         #bloomButton{
             background-image: url('../assets/bloom.svg');

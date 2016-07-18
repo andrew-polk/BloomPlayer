@@ -1,13 +1,12 @@
 /// <reference path="../typings/index.d.ts" />
+/// <reference path="../node_modules/@types/classnames/index.d.ts" />
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import Navigation from "./navigation";
 import "./controls.less";
 import {ToggleMusic} from "./music";
 import LiteEvent from "./event";
-import Animation from "./animation";
 import Music from "./music";
-import Narration from "./narration";
 import Multimedia from "./multimedia";
 
 export var Play: LiteEvent<void>;
@@ -45,11 +44,14 @@ export default class Controls {
         }
 
         // similarly, we mark the controls if the document has any background music
-        var musicButton;
+        let musicButton;
         if (Music.documentHasMusic()) {
             controlRoot.classList.add("hasMusic");
-            musicButton = (<div id="musicButton" className="button"
-                            onClick={() => ToggleMusic.raise() }/>);
+            musicButton = (<div id="musicButton" className= "button"
+                            onClick={(event: Event)  => {
+                                ToggleMusic.raise();
+                                (event.target as HTMLElement).classList.toggle("off");
+                            } } />);
         }
 
         ReactDOM.render(
