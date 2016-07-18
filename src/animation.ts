@@ -77,7 +77,7 @@ export default class Animation {
 
         // remove obsolete rules. We want to keep the permanent rules and the ones for the previous page
         // (which may still be visible). That's at most 2. It's harmless to keep an extra one.
-        while ((<CSSStyleSheet> stylesheet).cssRules.length > this.permanentRuleCount + 2) {
+        while ((<CSSStyleSheet> stylesheet).cssRules.length > this.permanentRuleCount + 4) {
             // remove the last (oldest, since we add at start) non-permanent rule
             (<CSSStyleSheet> stylesheet).removeRule((<CSSStyleSheet> stylesheet).cssRules.length
                 - this.permanentRuleCount - 1);

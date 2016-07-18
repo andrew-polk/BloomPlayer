@@ -44,7 +44,7 @@ export default class FadePageChanger implements IPageChanger {
             PageBeforeVisible.raise(targetPage);
 
             //at the end of the transition, clean things up
-            // this number must match what is in the stylesheet for opacity transition
+            // this number must match what is in the div.bloom-page rule in layout.less for opacity transition
             const transitionMilliseconds = 1000; //500;
             window.setTimeout(() => {
                         this.pageBeingHidden.classList.remove("currentPage");
@@ -53,11 +53,20 @@ export default class FadePageChanger implements IPageChanger {
                         targetPage.style.position = ""; //reset it
                         targetPage.style.top = ""; //reset it
                         targetPage.style.left = ""; //reset it
-                        if (targetPage) {
-                            PageVisible.raise(targetPage);
-                        }
+                        // if (targetPage) {
+                        //     PageVisible.raise(targetPage);
+                        // }
             }, transitionMilliseconds);
-
+            // It seems to give a nice effect to start the animation and sound while the fade is
+            // still in progress.
+            window.setTimeout(() => {
+                // targetPage.style.position = ""; //reset it
+                // targetPage.style.top = ""; //reset it
+                // targetPage.style.left = ""; //reset it
+               if (targetPage) {
+                    PageVisible.raise(targetPage);
+                }
+            }, 400);
         } else {
             // wrap around //TODO remove this when we can disable the "next button" on the last page
             //this.showFirstPage();
