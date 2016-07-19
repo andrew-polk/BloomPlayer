@@ -160,7 +160,6 @@ export default class Narration {
             if (attrDuration) {
                 // precomputed duration available, use it and go on.
                 this.pageDuration += parseFloat(attrDuration);
-                this.segmentIndex++;
                 this.getNextSegment();
                 return;
             }
