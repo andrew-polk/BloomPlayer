@@ -27,27 +27,33 @@ export default class Animation {
 
     constructor() {
         PageVisible.subscribe(page => {
-            this.pageVisible(page);
+            if (this.shouldAnimate(page)) {
+                this.pageVisible(page);
+            }
         });
         PageBeforeVisible.subscribe(page => {
-            this.setupAnimation(page, true);
+            if (this.shouldAnimate(page)) {
+                this.setupAnimation(page, true);
+            }
         });
         PageHidden.subscribe(page => {
             // Anything to do here?
         });
         PageDurationAvailable.subscribe(page => {
-            this.durationAvailable(page);
+            if (this.shouldAnimate(page)) {
+                this.durationAvailable(page);
+            }
         });
 
         Play.subscribe( () =>  {
-            if (this.animationView) {
+            if (this.animationView && this.shouldAnimate(this.currentPage)) {
                 const stylesheet = this.getAnimationStylesheet().sheet;
                 (<CSSStyleSheet> stylesheet).removeRule((<CSSStyleSheet> stylesheet).cssRules.length - 1);
                 this.permanentRuleCount--;
             }
         });
         Pause.subscribe( () => {
-            if (this.animationView) {
+            if (this.animationView && this.shouldAnimate(this.currentPage)) {
                 const stylesheet = this.getAnimationStylesheet().sheet;
                 (<CSSStyleSheet> stylesheet).insertRule(
                     ".bloom-animate {animation-play-state: paused; -webkit-animation-play-state: paused}",
@@ -332,5 +338,9 @@ export default class Animation {
             this.permanentRuleCount = 2; // (<CSSStyleSheet> <any> animationElement).cssRules.length;
         }
         return <HTMLStyleElement> animationElement;
+    }
+
+     private shouldAnimate(page: HTMLElement): boolean {
+        return page.classList.contains("Device16x9Landscape");
     }
 }
