@@ -62,8 +62,8 @@ export default class Animation {
             }
         });
 
-        // 600 is designed to make sure this happens AFTER we adjust the scale
-        window.addEventListener("orientationchange", () => window.setTimeout( () => this.adjustWrapDiv(), 600));
+        // 200 is designed to make sure this happens AFTER we adjust the scale
+        window.addEventListener("orientationchange", () => window.setTimeout( () => this.adjustWrapDiv(), 200));
     }
 
     public setupAnimation(page: HTMLElement, beforeVisible: boolean): void {

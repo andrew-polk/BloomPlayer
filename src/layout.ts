@@ -12,7 +12,7 @@ export function SetupLayout() {
 
     adjust();
     window.addEventListener("resize", () => window.setTimeout( adjust, 500));
-    window.addEventListener("orientationchange", () => window.setTimeout( adjust, 500));
+    window.addEventListener("orientationchange", () => window.setTimeout( adjust, 100));
     window.addEventListener("orientationchange", setOrientation);
 }
 
