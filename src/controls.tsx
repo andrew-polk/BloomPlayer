@@ -3,7 +3,7 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import Navigation from "./navigation";
 import "./controls.less";
-import {ToggleMusic} from "./music";
+import {Mute} from "./music";
 import LiteEvent from "./event";
 import Music from "./music";
 import Multimedia from "./multimedia";
@@ -11,9 +11,9 @@ import Multimedia from "./multimedia";
 export var Play: LiteEvent<void>;
 export var Pause: LiteEvent<void>;
 
-let paused: Boolean = false;
+let paused: boolean = false;
 
-export function IsPaused(): Boolean {
+export function IsPaused(): boolean {
     return paused;
 }
 
@@ -48,7 +48,10 @@ export default class Controls {
             controlRoot.classList.add("hasMusic");
             musicButton = (<div id="musicButton" className= "button"
                             onClick={(event: Event)  => {
-                                ToggleMusic.raise();
+                                const isOff: boolean  = (event.target as HTMLElement).classList.contains("off");
+                                //Start playing only if the overall multimedia is not paused, and 
+                                //also music was previously turned off by the user
+                                Mute.raise(!isOff);
                                 (event.target as HTMLElement).classList.toggle("off");
                             } } />);
         }

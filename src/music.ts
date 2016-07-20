@@ -1,7 +1,7 @@
 import {PageVisible, PageHidden} from "./navigation";
 import LiteEvent from "./event";
 import {Play, Pause} from "./controls";
-export var ToggleMusic: LiteEvent<HTMLElement>;
+export var Mute: LiteEvent<boolean >;
 
 let music: Music;
 
@@ -20,6 +20,8 @@ export default class Music {
 
     private playerPage: HTMLElement;
     private haveStartedMusic: Boolean;
+    private muted: boolean;
+    private paused: boolean;
 
     public constructor() {
         PageVisible.subscribe(page => {
@@ -30,16 +32,17 @@ export default class Music {
         PageHidden.subscribe(page => {
             // Nothing to do at this point
         });
-        ToggleMusic = new LiteEvent<HTMLElement>();
+        Mute = new LiteEvent<boolean>();
 
-        ToggleMusic.subscribe(() => {
+        Mute.subscribe((shouldMute: boolean) => {
+            this.muted = shouldMute;
             if (!this.playerPage) {
                  // no music listen in progress; and we don't want to try to
                  // initialize the player while we don't have a page that
                  // has music from which to try to get the music volume.
                 return;
             }
-            if (this.getPlayer().paused) {
+            if (!this.paused && !shouldMute) {
                 this.getPlayer().play();
             } else {
                 this.getPlayer().pause();
@@ -47,11 +50,13 @@ export default class Music {
         });
 
         Play.subscribe( () => {
-            if (this.playerPage) { // if not we aren't listening and can't getPlayer.
+            this.paused = false;
+            if (this.playerPage && !this.muted) { // if not we aren't listening and can't getPlayer.
                 this.getPlayer().play();
             }
          });
         Pause.subscribe( () => {
+            this.paused = true;
             if (this.playerPage) { // if not we aren't listening and can't getPlayer.
                 this.getPlayer().pause();
             }
