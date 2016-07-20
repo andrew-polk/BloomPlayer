@@ -9,6 +9,8 @@ export default class FadePageChanger implements IPageChanger {
     public constructor(parent: HTMLElement) {
         //empty
     }
+    
+    public static transitionMilliseconds = 2000;
 
     public showFirstPage() {
         if (this.currentPage()) {
@@ -45,7 +47,7 @@ export default class FadePageChanger implements IPageChanger {
 
             //at the end of the transition, clean things up
             // this number must match what is in the div.bloom-page rule in layout.less for opacity transition
-            const transitionMilliseconds = 2000;
+
             window.setTimeout(() => {
                         this.pageBeingHidden.classList.remove("currentPage");
                         this.pageBeingHidden.style.opacity = ""; //reset it
@@ -56,7 +58,7 @@ export default class FadePageChanger implements IPageChanger {
                         // if (targetPage) {
                         //     PageVisible.raise(targetPage);
                         // }
-            }, transitionMilliseconds);
+            }, FadePageChanger.transitionMilliseconds);
 
             // Start the animation and sound while the fade is still in progress.
             const millisecondsPauseBetweenPagesAnimationAndNarration = 0;

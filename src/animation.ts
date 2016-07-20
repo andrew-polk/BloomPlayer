@@ -1,6 +1,7 @@
 import {PageVisible, PageBeforeVisible, PageHidden} from "./navigation";
 import {PageDuration, PageDurationAvailable} from "./narration";
 import {Play, Pause /*, IsPaused*/} from "./controls";
+import FadePageChanger from "./FadePageChanger";
 
 // Defines the extra fields we expect to find in the dataset of an HTMLElement
 // that has animation specified (to make TypeScript and TSLint happy).
@@ -256,11 +257,13 @@ export default class Animation {
                 + "; } to{ transform-origin: 0px 0px; transform: " + finalTransform + "; } }", 0);
 
             //Insert the css for the imageView div that utilizes the newly created animation
+            // We make the animation longer than the narration by the transition time so
+            // the old animation continues during the fade.
             (<CSSStyleSheet> stylesheet).insertRule("." + animateStyleName
                 + " { transform-origin: 0px 0px; transform: "
                 + initialTransform
                 + "; animation-name: " + movePicName + "; animation-duration: "
-                + PageDuration + "s; animation-fill-mode: forwards; "
+                + (PageDuration + FadePageChanger.transitionMilliseconds/1000) + "s; animation-fill-mode: forwards; "
                 + "animation-timing-function: linear;}", 1);
             // Remove the rule we located earlier, if any. Index is increased because we inserted
             // the new rules before it.
