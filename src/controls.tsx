@@ -21,6 +21,8 @@ export function IsPaused(): boolean {
 // navigation, play/pause, toggling the music, etc.
 export default class Controls {
     private navigation: Navigation;
+    private buttonsEnabled: boolean = true;
+    private buttonEnableTimer: number;
 
     public constructor(navigation: Navigation) {
         this.navigation = navigation;
@@ -30,11 +32,35 @@ export default class Controls {
         document.body.insertAdjacentHTML("afterbegin", "<div id='control-root'></div>");
         const controlRoot: HTMLElement = document.getElementById("control-root");
         controlRoot.addEventListener("touchstart", (event) => {
+            if (!controlRoot.classList.contains("touchCapabilityDetected")) {
+                // Our very first touch! Presumably no hover detection, so buttons hidden.
+                // Therefore buttons should not respond to THIS touch. They will get
+                // enabled at end of this touch.
+                this.buttonsEnabled = false;
+            }
             controlRoot.classList.add("touchCapabilityDetected");
             controlRoot.classList.add("displayBasedOnTouch");
-            setTimeout(() =>
-                controlRoot.classList.remove("displayBasedOnTouch")
-                , 5000);
+            clearTimeout(this.buttonEnableTimer); // half a second from earlier click must do nothing
+            this.buttonEnableTimer = setTimeout(() => {
+                controlRoot.classList.remove("displayBasedOnTouch");
+                // Half a second after we hide the buttons we disable them.
+                // This avoids the annoyance of missing because the button disappeared
+                // just as you tapped it.
+                setTimeout(() => {
+                    this.buttonsEnabled = false;
+                }, 500)
+            } , 5000);
+        }, false);
+        
+        controlRoot.addEventListener("touchend", (event) => {
+            // after the end of the touch that showed the buttons, we enable them...if still visible
+            if (controlRoot.classList.contains("displayBasedOnTouch")) {
+                // We need SOME delay here, because this triggers BEFORE the click handler on
+                // the button that may also have been clicked.
+                setTimeout(() => {
+                    this.buttonsEnabled = true;
+                }, 20)
+            }
         }, false);
 
         // For now we consider a document multimedia if it has either narration or animation.
@@ -48,11 +74,13 @@ export default class Controls {
             controlRoot.classList.add("hasMusic");
             musicButton = (<div id="musicButton" className= "button"
                             onClick={(event: Event)  => {
-                                const isOff: boolean  = (event.target as HTMLElement).classList.contains("off");
-                                //Start playing only if the overall multimedia is not paused, and 
-                                //also music was previously turned off by the user
-                                Mute.raise(!isOff);
-                                (event.target as HTMLElement).classList.toggle("off");
+                                    if (this.buttonsEnabled) {
+                                    const isOff: boolean  = (event.target as HTMLElement).classList.contains("off");
+                                    //Start playing only if the overall multimedia is not paused, and 
+                                    //also music was previously turned off by the user
+                                    Mute.raise(!isOff);
+                                    (event.target as HTMLElement).classList.toggle("off");
+                                }
                             } } />);
         }
 
@@ -60,33 +88,62 @@ export default class Controls {
             <div id="controls">
                 <div id="toolbar">
                     <div id="homeButton" className="button"
-                        onClick={() => this.navigation.showFirstPage() }/>
+                        onClick={() => {
+                            if (this.buttonsEnabled) {
+                                this.navigation.showFirstPage();
+                            }
+                        } }/>
                     {musicButton}
                     {/* <div id="narrationButton" className="button"
                         onClick={() => alert("will someday toggle narration")}/> */}
                     <div id="bloomButton" className="button"
-                        onClick={() => alert("This book was created with Bloom. Find more books at BloomLibrary.org") }/>
+                        onClick={() => {
+                            if (this.buttonsEnabled) {
+                                alert("This book was created with Bloom. Find more books at BloomLibrary.org");
+                            }
+                        } }/>
                 </div>
                 <div id="middleBar">
                     <div id="previousButton" className="button"
-                        onClick={() => this.navigation.gotoPreviousPage() } />
+                        onClick={() => {
+                            if (this.buttonsEnabled) {
+                                this.navigation.gotoPreviousPage();
+                            }
+                        } } />
                     <div id="playAndPauseButton" className="button"
                         onClick={(event: Event) => {
-                            paused = !paused;
-                            const btn: HTMLElement = event.target as HTMLElement;
-                            if (paused) {
-                                btn.classList.add("paused");
-                                Pause.raise();
-                            } else {
-                                btn.classList.remove("paused");
-                                Play.raise();
+                            if (this.buttonsEnabled) {
+                                paused = !paused;
+                                const btn: HTMLElement = event.target as HTMLElement;
+                                if (paused) {
+                                    btn.classList.add("paused");
+                                    Pause.raise();
+                                } else {
+                                    btn.classList.remove("paused");
+                                    Play.raise();
+                                }
                             }
                         } } />
                     <div id="nextButton" className="button"
-                        onClick={() => this.navigation.gotoNextPage() } />
+                        onClick={() => {
+                            if (this.buttonsEnabled) {
+                                this.navigation.gotoNextPage();
+                            }
+                        } } />
                 </div>
             </div>,
             controlRoot
         );
     }
+    
+    // private buttonsEnabled() :boolean {
+    //     const controlRoot: HTMLElement = document.getElementById("control-root");
+    //     if (!controlRoot.classList.contains("touchCapabilityDetected")) {
+    //         return true; // no touch, buttons visble if mouse over them
+    //     }
+    //     // If it is a touch screen, buttons are enabled only if visible,
+    //     // which once we detect a touch screen is only while this class is present.
+    //     // Review: what if the button very recently disappeared?
+    //     return controlRoot.classList.contains("displayBasedOnTouch");
+    // }
 }
