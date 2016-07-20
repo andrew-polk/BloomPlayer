@@ -34,6 +34,9 @@ export default class Animation {
         PageBeforeVisible.subscribe(page => {
             if (this.shouldAnimate(page)) {
                 this.setupAnimation(page, true);
+            } else {
+                // may have left-over wrappers from when page previously played.
+                this.removeAnimationWrappers(page);
             }
         });
         PageHidden.subscribe(page => {
@@ -45,25 +48,27 @@ export default class Animation {
             }
         });
 
+        // It's harmless to insert and remove these rules when we are not animating,
+        // but disastrous if we insert one for a pause while animating, and don't remove
+        // it during a play while not animating. Best not to check for animation at all.
         Play.subscribe( () =>  {
-            if (this.animationView && this.shouldAnimate(this.currentPage)) {
-                const stylesheet = this.getAnimationStylesheet().sheet;
-                (<CSSStyleSheet> stylesheet).removeRule((<CSSStyleSheet> stylesheet).cssRules.length - 1);
-                this.permanentRuleCount--;
-            }
+            const stylesheet = this.getAnimationStylesheet().sheet;
+            (<CSSStyleSheet> stylesheet).removeRule((<CSSStyleSheet> stylesheet).cssRules.length - 1);
+            this.permanentRuleCount--;
         });
         Pause.subscribe( () => {
-            if (this.animationView && this.shouldAnimate(this.currentPage)) {
-                const stylesheet = this.getAnimationStylesheet().sheet;
-                (<CSSStyleSheet> stylesheet).insertRule(
-                    ".bloom-animate {animation-play-state: paused; -webkit-animation-play-state: paused}",
-                    (<CSSStyleSheet> stylesheet).cssRules.length);
-                this.permanentRuleCount++; // not really permanent, but not to be messed with.
-            }
+            const stylesheet = this.getAnimationStylesheet().sheet;
+            (<CSSStyleSheet> stylesheet).insertRule(
+                ".bloom-animate {animation-play-state: paused; -webkit-animation-play-state: paused}",
+                (<CSSStyleSheet> stylesheet).cssRules.length);
+            this.permanentRuleCount++; // not really permanent, but not to be messed with.
         });
 
-        // 200 is designed to make sure this happens AFTER we adjust the scale
-        window.addEventListener("orientationchange", () => window.setTimeout( () => this.adjustWrapDiv(), 200));
+        // 200 is designed to make sure this happens AFTER we adjust the scale.
+        // Note that if we are not currently animating, this.currentPage may be null or
+        // obsolete. It is only used if we need to turn OFF the animation.
+        window.addEventListener("orientationchange", () => window.setTimeout(
+            () => this.adjustWrapDiv(this.currentPage), 200));
     }
 
     public setupAnimation(page: HTMLElement, beforeVisible: boolean): void {
@@ -290,16 +295,61 @@ export default class Animation {
         }
     }
 
-    private adjustWrapDiv(): void {
-        // Nothing to do if we don't have a wrap div currently.
-        if ((!this.animationView) || this.animationView.children.length !== 1) {
+    // Adjust the wrap div for a change of orientation. The name is slightly obsolete
+    // since currently we don't continue the animation if we change to portrait mode,
+    // where animation is disabled. And if we change to landscape mode, we don't try
+    // to start up the animation in the middle of the narration. So all it really
+    // has to do currently is REMOVE the animation stuff if changing to portrait.
+    // However, since everything else is built around shouldAnimatePage, it seemed
+    // worth keeping the logic that adjusts things if we ever go from one animated
+    // orientation to another. Note, however, that the 'page' argument passed is not
+    // currently valid if turning ON animation. Thus, we will need to do more to get
+    // the right page if we want to turn animation ON while switching to horizontal.
+    private adjustWrapDiv(page: HTMLElement): void {
+        if (!page) {
             return;
         }
-        const wrapDiv = <HTMLElement> this.animationView.children.item(0);
-        if (!this.hasClass(<HTMLElement> this.animationView.firstChild, this.wrapperClassName)) {
+        if (!this.shouldAnimate(page)) {
+            // we may have a left-over wrapDiv from animating in the other orientation,
+            // which could confuse things.
+            this.removeAnimationWrappers(page);
+            return;
+        }
+        // Nothing to do if we don't have a wrap div currently.
+        const wrapDiv = this.getWrapDiv(page);
+        if (!wrapDiv) {
             return;
         }
         this.updateWrapDivSize(wrapDiv);
+    }
+
+    private getWrapDiv(page: HTMLElement): HTMLElement {
+        if (!page) {
+            return null;
+        }
+        const animationDiv = Animation.getAnimationView(page);
+        if ((!animationDiv) || animationDiv.children.length !== 1) {
+            return null;
+        }
+        const wrapDiv = <HTMLElement> animationDiv.firstElementChild;
+        if (!this.hasClass(wrapDiv, this.wrapperClassName)) {
+            return null;
+        }
+        return wrapDiv;
+    }
+
+    private removeAnimationWrappers(page: HTMLElement) {
+        const wrapDiv = this.getWrapDiv(page);
+        if (!wrapDiv) {
+            return;
+        }
+        const movingDiv = wrapDiv.firstElementChild;
+        const parent = wrapDiv.parentElement;
+        parent.setAttribute("style", movingDiv.getAttribute("style"));
+        while (movingDiv.childNodes.length) {
+            parent.appendChild(this.animationView.childNodes[0]);
+        }
+        parent.removeChild(wrapDiv);
     }
 
     private  addClass(elt: HTMLElement, className: string) {
