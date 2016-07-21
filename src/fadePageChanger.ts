@@ -41,7 +41,11 @@ export default class FadePageChanger implements IPageChanger {
             window.setTimeout( () => {
                 targetPage.style.opacity = "1.0";
                 current.style.opacity = "0";
-            }, 0);
+                //NB: a delay of 0 may seem to work, especially on a really powerful machine.
+                //But on some machines the likelihood of getting no fade goes up,
+                //indicating that the start opacity doesn't get noticed by the transition system.
+                //10 is plenty on my dev machine, so I'm setting to 50 for safety.
+            }, 50);
 
             PageBeforeVisible.raise(targetPage);
 
