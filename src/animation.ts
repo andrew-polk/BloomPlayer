@@ -1,7 +1,7 @@
 import {PageVisible, PageBeforeVisible, PageHidden} from "./navigation";
 import {PageDuration, PageDurationAvailable} from "./narration";
 import {Play, Pause /*, IsPaused*/} from "./controls";
-import FadePageChanger from "./FadePageChanger";
+import FadePageChanger from "./fadePageChanger";
 
 // Defines the extra fields we expect to find in the dataset of an HTMLElement
 // that has animation specified (to make TypeScript and TSLint happy).
@@ -263,7 +263,7 @@ export default class Animation {
                 + " { transform-origin: 0px 0px; transform: "
                 + initialTransform
                 + "; animation-name: " + movePicName + "; animation-duration: "
-                + (PageDuration + FadePageChanger.transitionMilliseconds/1000) + "s; animation-fill-mode: forwards; "
+                + (PageDuration + FadePageChanger.transitionMilliseconds / 1000) + "s; animation-fill-mode: forwards; "
                 + "animation-timing-function: linear;}", 1);
             // Remove the rule we located earlier, if any. Index is increased because we inserted
             // the new rules before it.

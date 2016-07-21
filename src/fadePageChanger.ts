@@ -4,13 +4,13 @@ import {IPageChanger} from "./IPageChanger";
 // The FadeTransition is one system for transitioning between pages
 export default class FadePageChanger implements IPageChanger {
 
+    public static transitionMilliseconds = 2000;
+
     private pageBeingHidden: HTMLElement;
 
     public constructor(parent: HTMLElement) {
         //empty
     }
-    
-    public static transitionMilliseconds = 2000;
 
     public showFirstPage() {
         if (this.currentPage()) {
