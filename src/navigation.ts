@@ -30,6 +30,8 @@ export default class Navigation {
         GoNextPage.subscribe( () => this.gotoNextPage());
 
         this.setupViewerWrapper(parent);
+
+        window.addEventListener("orientationchange", () => window.setTimeout( () => this.setPageChangerForDocument(), 5));
     }
 
     public setPageChangerForDocument() {
