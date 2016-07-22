@@ -31,7 +31,8 @@ export default class Navigation {
 
         this.setupViewerWrapper(parent);
 
-        window.addEventListener("orientationchange", () => window.setTimeout( () => this.setPageChangerForDocument(), 5));
+        window.addEventListener("orientationchange",
+            () => window.setTimeout( () => this.setPageChangerForDocument(), 5));
     }
 
     public setPageChangerForDocument() {
