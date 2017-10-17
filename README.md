@@ -8,7 +8,7 @@ BloomPlayer.js is consumed by the Bloom Desktop project. When dropped into a Blo
 
 For Bloom books with multimedia content, BloomPlayer handles
 * playing narration
-* hilighting sentences as you listen to narration (TODO)
+* hilighting sentences as you listen to narration
 * Ken Burns-style animation
 * background music
 
