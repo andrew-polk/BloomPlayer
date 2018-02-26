@@ -1,6 +1,6 @@
 import "./controls.less";
 import LiteEvent from "./pagePlayer/event";
-import CarouselPageChanger from "./CarouselPageChanger";
+import CarouselPageChanger from "./carouselPageChanger";
 import FadePageChanger from "./fadePageChanger";
 import {IPageChanger} from "./IPageChanger";
 import {IsLandscape} from "./layout";
