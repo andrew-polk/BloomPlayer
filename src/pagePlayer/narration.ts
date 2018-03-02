@@ -104,7 +104,15 @@ export default class Narration {
         this.startPause = this.startPlay;
         if (this.segments.length === 0) {
             if (this.androidMode) {
-                // android will handle delays; just tell it the page is done.
+                // We need this to allow animation to start, for cases where we have
+                // that but no audio.
+                PageDuration = 3.0;
+                PageDurationAvailable.raise(page);
+                // don't want to try to simulate a PageNarrationComplete at the end of
+                // the animation, because Android is really handling the audio, pause, play,
+                // etc. and it's not set up to abort the event. As far as narration is
+                // concerned, this page is done; the player will take care not to
+                // advance too soon, if it is set to auto-advance at all.
                 PageNarrationComplete.raise();
                 return;
             }

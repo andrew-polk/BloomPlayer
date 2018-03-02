@@ -153,7 +153,10 @@ export default class Animation {
                 // Enhance: if the original div had content (typically an <img>), 
                 // try to use its image to figure aspect ratio.
                 // For now, just set a default.
-                wrapDiv.setAttribute("data-aspectRatio", (4 / 3).toString());
+                wrapDiv.setAttribute("data-aspectRatio", (16 / 9).toString());
+                // we're not going to make it visible when we get the size, so just do it now.
+                const oldStyle = wrapDiv.getAttribute("style");
+                wrapDiv.setAttribute("style", oldStyle.substring("visibility: hidden; ".length));
             }
 
             // If the animation view had children (typically it has none, just shows a background image),
@@ -248,9 +251,9 @@ export default class Animation {
         // performance over scale/transform. (https://www.kirupa.com/html5/ken_burns_effect_css.htm)
         // May also help with blurring of material originally hidden.
         const initialTransform = "scale3d(" + initialScaleWidth + ", " + initialScaleHeight
-            + ", 1.0) translate3d(-" + initialX + "px, -" + initialY + "px, 0px)";
+            + ", 1.0) translate3d(" + (-initialX) + "px, " + (-initialY) + "px, 0px)";
         const finalTransform = "scale3d(" + finalScaleWidth + ", " + finalScaleHeight
-            + ", 1.0) translate3d(-" + finalX + "px, -" + finalY + "px, 0px)";
+            + ", 1.0) translate3d(" + (-finalX) + "px, " + (-finalY) + "px, 0px)";
 
         if (page !== this.currentPage || page !== this.lastDurationPage || beforeVisible) {
             // We aren't ready to start the animation, either because we haven't yet
