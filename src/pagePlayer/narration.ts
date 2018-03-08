@@ -229,7 +229,7 @@ export default class Narration {
     }
 
     private static getAudioElements(): HTMLElement[] {
-        return [].concat.apply([], this.getRecordableDivs().map(x => this.findAll(".audio-sentence[data-duration]", x)));
+        return [].concat.apply([], this.getRecordableDivs().map(x => this.findAll(".audio-sentence", x)));
     }
 
     private static setCurrentSpan(current: Element, changeTo: HTMLElement): void {
