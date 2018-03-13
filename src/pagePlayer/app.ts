@@ -9,11 +9,16 @@ import {SetupNarrationEvents, PageNarrationComplete, PageDurationAvailable, Comp
 // Currently the only such app is BloomReader, an Android app; and sadly, a few things in this
 // version are very specific to interacting with the Android code.
 
+// These variables are global so they can be accessed by necessarily global functions
+// that are called directly from the app. Don't try to access them with this.whatever!
 let animation: Animation;
 let canInitialize = false; // set true when doc loaded
 let startNarrationRequested = false; // set true when startNarration called by android
 let beforeVisibleInitRequested = false; // set true when handlePageBeforeVisible called by android.
 let initialized = false;
+// This is used to save the value passed to enableAnimation(), in case it is
+// called before we get an animation object.
+let animationActive: boolean = true;
 
 export function startNarration() {
     startNarrationRequested = true;
@@ -24,6 +29,8 @@ export function startNarration() {
             const page = <HTMLElement> (document.body.querySelector(".bloom-page"));
             if (page) {
                     PlayAllSentences(page);
+                    // This may or may not cause the animation to start, depending on
+                    // what was last passed to enableAnimation().
                     animation.HandlePageVisible(page);
             }
         } else {
@@ -33,6 +40,16 @@ export function startNarration() {
         }
     }
     // otherwise, we were called before doc loaded; when it is we will proceed.
+}
+
+export function enableAnimation(doAnimate: boolean) {
+    // In case this is called before we initialize() and have an animation object,
+    // we need to remember the value. If we already have the animation object,
+    // update it.
+    animationActive = doAnimate;
+    if (animation) {
+        animation.setAnimationActive(doAnimate);
+    }
 }
 
 export function handlePageBeforeVisible() {
@@ -69,9 +86,11 @@ function initialize() {
     SetupNarrationEvents();  // very early, defines events others subscribe to.
     SetAndroidMode();
     animation = new Animation();
-    // For now BloomReader does not support rotating the screen, so if we're going to
-    // do animation at all it needs to happen even in portrait orientation.
-    animation.setShouldAnimateInAllOrientations(true);
+    // BloomReader (based on properties in the book file) controls whether
+    // animations happen in all orientations or only some. We need to configure
+    // the animation object to respect this, and set the current state.
+    animation.setAnimationControlledByApp(true);
+    animation.setAnimationActive(animationActive);
 
     PageDurationAvailable.subscribe(page => {
         animation.HandlePageDurationAvailable(page, PageDuration); }
