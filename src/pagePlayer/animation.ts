@@ -22,7 +22,10 @@ export default class Animation {
     private wrapperClassName = "bloom-ui-animationWrapper";
     private animationDuration: number = 3000;
     private fadePageTransitionMilliseconds: number = 100;
-    private shouldAnimateInAllOrientations: boolean = false;
+    private animationControlledByApp: boolean = false;
+    // Controlled by setAnimationActive(), this determines whether to animate
+    // pan/zoom when animationControlledByApp is true.
+    private animationActive: boolean = true;
 
     constructor() {
         // 200 is designed to make sure this happens AFTER we adjust the scale.
@@ -54,8 +57,12 @@ export default class Animation {
         }
     }
 
-    public setShouldAnimateInAllOrientations(val: boolean) {
-        this.shouldAnimateInAllOrientations = val;
+    public setAnimationControlledByApp(val: boolean) {
+        this.animationControlledByApp = val;
+    }
+
+    public setAnimationActive(val: boolean): void {
+        this.animationActive = val;
     }
 
     // Only applicable to resuming paused animation (by removing the pause CSS rule)
@@ -411,6 +418,9 @@ export default class Animation {
     }
 
      private shouldAnimate(page: HTMLElement): boolean {
-        return this.shouldAnimateInAllOrientations || page.classList.contains("Device16x9Landscape");
+        if (this.animationControlledByApp) {
+            return this.animationActive;
+        }
+        return page.classList.contains("Device16x9Landscape");
     }
 }
