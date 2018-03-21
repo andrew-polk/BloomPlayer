@@ -133,19 +133,27 @@ export default class Animation {
             wrapDiv.setAttribute("style", "visibility: hidden;");
 
             const styleData = this.animationView.getAttribute("style");
-            if (styleData) {
-                // This somewhat assumes the ONLY style attribute is the background image.
-                // I think we can improve that when and if it becomes an issue.
-                this.animationView.setAttribute("style", "");
-                movingDiv.setAttribute("style", styleData);
-                const imageSrc = styleData.replace(/.*url\((['"])([^)]*)\1\).*/i, "$2");
+            var img = this.animationView.getElementsByTagName("img")[0];
+            let imageSrc = null;
+            if (img || styleData) {
+                if (img) {
+                    // I don't think this branch has been tested, since export to bloom reader
+                    // converts all images to the background-image approach.
+                    imageSrc = img.getAttribute("src");
+                } else if (styleData) {
+                    // This somewhat assumes the ONLY style attribute is the background image.
+                    // I think we can improve that when and if it becomes an issue.
+                    this.animationView.setAttribute("style", "");
+                    movingDiv.setAttribute("style", styleData);
+                    imageSrc = styleData.replace(/.*url\((['"])([^)]*)\1\).*/i, "$2");
+                }
                 const image = new Image();
                 image.addEventListener("load", () => {
                     if (image.height) {  // some browsers may not produce this?
                         wrapDiv.setAttribute("data-aspectRatio", (image.width / image.height).toString());
                     } else {
                         // can't get accurate size for some reason, use fall-back.
-                        wrapDiv.setAttribute("data-aspectRatio", (4 / 3).toString());
+                        wrapDiv.setAttribute("data-aspectRatio", (16 / 9).toString());
                     }
                     this.updateWrapDivSize(wrapDiv);
                     this.insertAnimationRules(page, wrapDiv, beforeVisible);
@@ -157,8 +165,7 @@ export default class Animation {
                 // it to be loaded).
                 image.src = imageSrc;
             } else {
-                // Enhance: if the original div had content (typically an <img>), 
-                // try to use its image to figure aspect ratio.
+                // Is there anything there?
                 // For now, just set a default.
                 wrapDiv.setAttribute("data-aspectRatio", (16 / 9).toString());
                 // we're not going to make it visible when we get the size, so just do it now.
@@ -171,6 +178,9 @@ export default class Animation {
             while (this.animationView.childNodes.length) {
                 movingDiv.appendChild(this.animationView.childNodes[0]);
             }
+            // careful here...styles of wrapDiv tend to get erased by updateWrapDivSize.
+            // That method also ensures it has a white background.
+            wrapDiv.style.backgroundColor = "white";
             this.animationView.appendChild(wrapDiv);
         } else {
             wrapDiv = <HTMLElement> this.animationView.children.item(0);
@@ -309,6 +319,9 @@ export default class Animation {
         } else {
             oldStyle = "";
         }
+        // We always need the wrapDiv to have a white background, in case the image we're
+        // animating has transparent regions.
+        oldStyle += "background-color: white;";
         if (imageAspectRatio < viewAspectRatio) {
             // black bars on side
             const imageWidth = viewHeight * imageAspectRatio;
