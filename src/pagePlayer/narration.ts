@@ -83,13 +83,18 @@ export default class Narration {
     public static playAllSentences(page: HTMLElement): void {
         this.playerPage = page;
         const audioElts = this.getAudioElements();
-        if (audioElts.length === 0) { return; } // nothing to play.
         const original: Element = page.querySelector(".ui-audioCurrent");
-        const first = audioElts[0];
-        this.setCurrentSpan(original, first);
-        this.playingAll = true;
-        this.setStatus("listen", Status.Active);
-        this.playCurrentInternal();
+        for (let firstIndex = 0; firstIndex < audioElts.length; firstIndex++) {
+            const first = audioElts[firstIndex];
+            if (!this.canPlayAudio(first)) {
+                continue;
+            }
+            this.setCurrentSpan(original, first);
+            this.playingAll = true;
+            this.setStatus("listen", Status.Active);
+            this.playCurrentInternal();
+            return;
+        }
     }
 
     public static computeDuration(page: HTMLElement): void {
@@ -136,20 +141,37 @@ export default class Narration {
         if (this.playingAll) {
             const current: Element = this.playerPage.querySelector(".ui-audioCurrent");
             const audioElts = this.getAudioElements();
-            const nextIndex = audioElts.indexOf(<HTMLElement> current) + 1;
-            if (nextIndex < audioElts.length) {
+            let nextIndex = audioElts.indexOf(<HTMLElement> current) + 1;
+            while (nextIndex < audioElts.length) {
                 const next = audioElts[nextIndex];
+                if (!this.canPlayAudio(next)) {
+                    nextIndex++;
+                    continue;
+                }
                 this.setCurrentSpan(current, next);
                 this.setStatus("listen", Status.Active); // gets returned to enabled by setCurrentSpan
                 this.playCurrentInternal();
                 return;
             }
             this.playingAll = false;
+            this.setCurrentSpan(current, null);
             PageNarrationComplete.raise(this.playerPage);
             //this.changeStateAndSetExpected("listen");
             return;
         }
         //this.changeStateAndSetExpected("next");
+    }
+
+    public static canPlayAudio(current: Element): boolean {
+        if (this.androidMode) {
+            // Can't get using the player to work on Android, so we just use a callback to
+            // ask the Android to play it for us. It will call playEnded when appropriate.
+            // In this case the Android also handles all the pause/resume logic so the code
+            // here connected with play and resume is not used.
+            return (<any> (<any> (window)).Android).audioExists(this.currentAudioUrl(current.getAttribute("id")));
+        } else {
+            return true; // currently no way to check in regular player mode.
+        }
     }
 
     private static playerPage: HTMLElement;
@@ -236,8 +258,10 @@ export default class Narration {
         if (current) {
             this.removeClass(current, "ui-audioCurrent");
         }
-        this.addClass(changeTo, "ui-audioCurrent");
-        this.idOfCurrentSentence = changeTo.getAttribute("id");
+        if (changeTo) {
+            this.addClass(changeTo, "ui-audioCurrent");
+            this.idOfCurrentSentence = changeTo.getAttribute("id");
+        }
         this.updatePlayerStatus();
         //this.changeStateAndSetExpected("record");
     }
