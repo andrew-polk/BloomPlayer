@@ -95,6 +95,8 @@ export default class Narration {
             this.playCurrentInternal();
             return;
         }
+        // Nothing to play
+        PageNarrationComplete.raise();
     }
 
     public static computeDuration(page: HTMLElement): void {
