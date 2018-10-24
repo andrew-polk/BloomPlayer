@@ -244,8 +244,17 @@ export default class Narration {
 
     // Returns all elements that match CSS selector {expr} as an array.
     // Querying can optionally be restricted to {container}’s descendants
-    private static findAll(expr: string, container: HTMLElement): HTMLElement[] {
-        return [].slice.call((container || document).querySelectorAll(expr));
+    // If includeSelf is true, it includes both itself as well as its descendants. Otherwise, it only includes descendants.
+    private static findAll(expr: string, container: HTMLElement, includeSelf: boolean = false): HTMLElement[] {
+        // querySelectorAll checks all the descendants
+        let allMatches: HTMLElement[] = [].slice.call((container || document).querySelectorAll(expr));
+
+        // Now check itself
+        if (includeSelf && container && container.matches(expr)) {
+            allMatches.push(container);
+        }
+
+        return allMatches;
     }
 
     private static getRecordableDivs(): HTMLElement[] {
@@ -253,7 +262,7 @@ export default class Narration {
     }
 
     private static getAudioElements(): HTMLElement[] {
-        return [].concat.apply([], this.getRecordableDivs().map(x => this.findAll(".audio-sentence", x)));
+        return [].concat.apply([], this.getRecordableDivs().map(x => this.findAll(".audio-sentence", x, true)));
     }
 
     private static setCurrentSpan(current: Element, changeTo: HTMLElement): void {
