@@ -244,7 +244,8 @@ export default class Narration {
 
     // Returns all elements that match CSS selector {expr} as an array.
     // Querying can optionally be restricted to {container}’s descendants
-    // If includeSelf is true, it includes both itself as well as its descendants. Otherwise, it only includes descendants.
+    // If includeSelf is true, it includes both itself as well as its descendants.
+    // Otherwise, it only includes descendants.
     private static findAll(expr: string, container: HTMLElement, includeSelf: boolean = false): HTMLElement[] {
         // querySelectorAll checks all the descendants
         let allMatches: HTMLElement[] = [].slice.call((container || document).querySelectorAll(expr));

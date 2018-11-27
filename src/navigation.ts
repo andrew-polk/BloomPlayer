@@ -1,9 +1,9 @@
-import "./controls.less";
-import LiteEvent from "./pagePlayer/event";
 import CarouselPageChanger from "./carouselPageChanger";
+import "./controls.less";
 import FadePageChanger from "./fadePageChanger";
 import {IPageChanger} from "./IPageChanger";
 import {IsLandscape} from "./layout";
+import LiteEvent from "./pagePlayer/event";
 import Multimedia from "./pagePlayer/multimedia";
 
 export var PageVisible: LiteEvent<HTMLElement>;
@@ -45,7 +45,7 @@ export default class Navigation {
 
     public showFirstPage() {
         this.setPageChangerForDocument();
-        [].forEach.call(document.body.querySelectorAll(".bloom-page"), function(page){
+        [].forEach.call(document.body.querySelectorAll(".bloom-page"), (page) => {
                 page.classList.remove("currentPage");
             });
 

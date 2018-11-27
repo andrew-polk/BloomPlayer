@@ -1,5 +1,5 @@
-import {PageVisible, PageBeforeVisible, PageHidden} from "./navigation";
 import {IPageChanger} from "./IPageChanger";
+import {PageBeforeVisible, PageHidden, PageVisible} from "./navigation";
 
 // The FadeTransition is one system for transitioning between pages
 export default class FadePageChanger implements IPageChanger {

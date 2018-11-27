@@ -1,7 +1,8 @@
 /// <reference path="../../typings/index.d.ts" />
+
 import Animation from "./animation";
-import {SetupNarrationEvents, PageNarrationComplete, PageDurationAvailable, ComputeDuration, PageDuration,
-    PlayAllSentences, PlaybackCompleted, SetAndroidMode} from "./narration";
+import {ComputeDuration, PageDuration, PageDurationAvailable, PageNarrationComplete,
+    PlayAllSentences, PlaybackCompleted, SetAndroidMode, SetupNarrationEvents} from "./narration";
 
 // This is the root file in webpack-config.js for generating bloomPagePlayer, a cut-down version
 // of BloomPlayer designed for use embedded in an app which uses its own controls for play, pause,

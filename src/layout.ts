@@ -1,5 +1,5 @@
 import "./layout.less";
-import {PageVisible, PageHidden} from "./navigation";
+import {PageHidden, PageVisible} from "./navigation";
 
 // "Layout" here is the task of fitting the material to the device
 // and orientation.
@@ -18,7 +18,7 @@ export function SetupLayout() {
 
 export function SetupLayoutEvents() {
     PageVisible.subscribe( (page) => {
-        window.setTimeout(function() {
+        window.setTimeout(() => {
             page.classList.add("showDisplayEffect"); //cause title to fade in
         }, 0);
     });

@@ -133,7 +133,7 @@ export default class Animation {
             wrapDiv.setAttribute("style", "visibility: hidden;");
 
             const styleData = this.animationView.getAttribute("style");
-            var img = this.animationView.getElementsByTagName("img")[0];
+            const img = this.animationView.getElementsByTagName("img")[0];
             let imageSrc = null;
             if (img || styleData) {
                 if (img) {

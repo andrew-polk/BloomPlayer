@@ -1,6 +1,6 @@
-import {PageVisible, PageHidden} from "./navigation";
+import {Pause, Play} from "./controls";
+import {PageHidden, PageVisible} from "./navigation";
 import LiteEvent from "./pagePlayer/event";
-import {Play, Pause} from "./controls";
 export var Mute: LiteEvent<boolean >;
 
 let music: Music;
