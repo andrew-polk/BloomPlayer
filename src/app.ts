@@ -1,29 +1,26 @@
 /// <reference path="../typings/index.d.ts" />
 
-import {SetupLayout, SetupLayoutEvents} from "./layout";
-import Animation from "./pagePlayer/animation";
-import {SetupMusic} from "./music";
-import {SetupNarrationEvents, PageNarrationComplete, PageDurationAvailable, PageDuration,
-    PlayNarration, PauseNarration, PlayAllSentences, ComputeDuration} from "./pagePlayer/narration";
-import Controls from "./controls";
-import Navigation, {GoNextPage} from "./navigation";
-import {Scale} from "./layout";
-import Multimedia from "./pagePlayer/multimedia";
-import {Play, Pause} from "./controls";
-import {PageVisible, PageBeforeVisible} from "./navigation";
+import Controls, {Pause, Play} from "./controls";
 import FadePageChanger from "./fadePageChanger";
+import {Scale, SetupLayout, SetupLayoutEvents} from "./layout";
+import {SetupMusic} from "./music";
+import Navigation, {GoNextPage, PageBeforeVisible, PageVisible} from "./navigation";
+import Animation from "./pagePlayer/animation";
+import Multimedia from "./pagePlayer/multimedia";
+import {ComputeDuration, PageDuration, PageDurationAvailable, PageNarrationComplete, PauseNarration,
+    PlayAllSentences, PlayNarration, SetupNarrationEvents} from "./pagePlayer/narration";
 
 let animation: Animation;
 let controls: Controls;
 
 function attach() {
-     if (document.getElementById("root")) {
+    if (document.getElementById("root")) {
         // this is not being called (that's good)
         console.log("mystery second call of attach");
         return;
-     }
+    }
     // this slight delay makes it possible to catch breakpoints in vscode even for things that happen right away.
-     window.setTimeout( () => {
+    window.setTimeout( () => {
         if (document.getElementById("root")) {
             // this is being called (that's bad)
             console.log("mystery second call of attach.timeout");
@@ -40,7 +37,7 @@ function attach() {
         PageBeforeVisible.subscribe(page => animation.HandlePageBeforeVisible(page));
         PageDurationAvailable.subscribe(page => {
             animation.HandlePageDurationAvailable(page, PageDuration); }
-    );
+        );
         Play.subscribe(() =>  animation.PlayAnimation());
         Pause.subscribe(() => animation.PauseAnimation());
 

@@ -1,5 +1,5 @@
-import {PageVisible, PageBeforeVisible, PageHidden} from "./navigation";
 import {IPageChanger} from "./IPageChanger";
+import {PageBeforeVisible, PageHidden, PageVisible} from "./navigation";
 
 // The Carousel is one system for transitioning between pages.
 // It transitions by sliding pages in and out, in approximation
