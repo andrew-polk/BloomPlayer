@@ -1,16 +1,23 @@
 # BloomPlayer
-Navigate Bloom books while basking in sound and motion
 
-BloomPlayer.js is consumed by the Bloom Desktop project. When dropped into a Bloom Book html file, it provides a basic "player" that work in browsers and phone apps. The BloomPlayer handles:
+Navigate **Bloom** books while basking in sound and motion
+
+1. One output, `bloomPlayer.js`, is consumed by the **Bloom Desktop** project for the Cmd Line Interface option **_-hydrate_**. When dropped into a Bloom Book html file, it should provide a basic "player" that work in browsers and phone apps.
+
+2. A second output, `bloomPagePlayer.js`, contains only the code for dealing with a single page and is consumed by the BloomReader Android app.
+
+The **BloomPlayer** handles:
 
 * turning pages
 * adjusting to device screens
 
-For Bloom books with multimedia content, BloomPlayer handles
-* playing narration
-* hilighting sentences as you listen to narration
-* Ken Burns-style animation
-* background music
+In addition, for **Bloom** books with multimedia content, **BloomPlayer** handles:
+
+* playing narration (from **Bloom**'s *Talking Book Tool*)
+* highlighting sentences as you listen to narration
+* Ken Burns-style animation (from **Bloom**'s *Motion Tool*)
+* background music (from **Bloom**'s *Music Tool*)
+* playing videos (from **Bloom**'s *Sign Language Tool*)
 
 ## Dependencies
 Node version >= 5.0 and NPM >= 3**.

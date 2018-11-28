@@ -48,7 +48,7 @@
             "webRoot": "${workspaceRoot}",
             "sourceMaps": true,
             "userDataDir": "${workspaceRoot}/output/chrome"
-            ,"diagnosticLogging": true
+            ,"trace": true
         }
     ]
 }
