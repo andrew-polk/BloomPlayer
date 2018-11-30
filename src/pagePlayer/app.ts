@@ -1,8 +1,10 @@
 /// <reference path="../../typings/index.d.ts" />
 
 import Animation from "./animation";
+import Multimedia from "./multimedia";
 import {ComputeDuration, PageDuration, PageDurationAvailable, PageNarrationComplete,
     PlayAllSentences, PlaybackCompleted, SetAndroidMode, SetupNarrationEvents} from "./narration";
+import VideoPlayer from "./videoPlayer";
 
 // This is the root file in webpack-config.js for generating bloomPagePlayer, a cut-down version
 // of BloomPlayer designed for use embedded in an app which uses its own controls for play, pause,
@@ -20,14 +22,18 @@ let initialized = false;
 // This is used to save the value passed to enableAnimation(), in case it is
 // called before we get an animation object.
 let animationActive: boolean = true;
+// When the doc is loaded and initialized, we store the page here so we don't have to keep
+// fetching it.
+let page: HTMLDivElement;
 
+// Every function below which starts with "export function" can be called by (Android) apps
+// by using 'mWebView.evaluateJavascript("Root.{function name}()", {callback or null})'
 export function startNarration() {
     startNarrationRequested = true;
 
     if (canInitialize ) {
         if (initialized) {
             // typical, we already initialized most stuff in the process of doing handlePageBeforeVisible()
-            const page = <HTMLElement> (document.body.querySelector(".bloom-page"));
             if (page) {
                     PlayAllSentences(page);
                     // This may or may not cause the animation to start, depending on
@@ -58,8 +64,7 @@ export function handlePageBeforeVisible() {
 
     if (canInitialize) {
         if (initialized) {
-            const page = <HTMLElement> (document.body.querySelector(".bloom-page"));
-            if (page) {
+            if (page && Animation.pageHasAnimation(page)) {
                 animation.HandlePageBeforeVisible(page);
             }
         } else {
@@ -67,6 +72,36 @@ export function handlePageBeforeVisible() {
         }
     }
     // otherwise, we were called before doc loaded; when it is we will proceed.
+}
+
+// Tells app (Android or other) whether the current page has multimedia or not.
+// The return value is a string instead of boolean because the callback function
+// for evaluateJavascript() is of type ValueCallback<string>.
+export function requestPageMultimediaState(): string {
+    if (canInitialize) {
+        if (!initialized) {
+            initialize();
+        }
+        return hasMultimedia().toString();
+    }
+    // don't think this can happen, but if we were called before doc loaded, we'll just get "false"
+    return "false";
+}
+
+function hasMultimedia(): boolean {
+    return (page && Multimedia.pageHasMultimedia(page));
+}
+
+export function pauseVideo() {
+    if (page && VideoPlayer.pageHasVideo(page)) {
+        VideoPlayer.pauseVideo(page);
+    }
+}
+
+export function playVideo() {
+    if (page && VideoPlayer.pageHasVideo(page)) {
+        VideoPlayer.playVideo(page);
+    }
 }
 
 // Called by android code when android sound play completed
@@ -93,8 +128,8 @@ function initialize() {
     animation.setAnimationControlledByApp(true);
     animation.setAnimationActive(animationActive);
 
-    PageDurationAvailable.subscribe(page => {
-        animation.HandlePageDurationAvailable(page, PageDuration); }
+    PageDurationAvailable.subscribe(pageElement => {
+        animation.HandlePageDurationAvailable(pageElement, PageDuration); }
     );
 
     // Subscribe even if this page has no audio, since ComputeDuration will (currently) trigger page
@@ -102,10 +137,10 @@ function initialize() {
     // (Besides, quite likely even if this page has no audio, if the document as a whole has narration,
     // its title very well may have it, and that will be in the data div which is common to all pages,
     // so we will find an audio-sentence in the doc.)
-    PageNarrationComplete.subscribe(page => {
+    PageNarrationComplete.subscribe(() => {
         (<any> (<any> (window)).Android).pageCompleted();
     });
-    const page = <HTMLElement> (document.body.querySelector(".bloom-page"));
+    page = <HTMLDivElement> document.body.querySelector(".bloom-page");
     if (page) {
         ComputeDuration(page); // needed later for animation, though we don't need the result right here.
         // if startNarration has been called (typically, initialize is being called from doc loaded event),
