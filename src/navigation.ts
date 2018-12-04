@@ -70,7 +70,7 @@ export default class Navigation {
 
     public  gotoPreviousPage(): void {
         const target = this.currentPage().previousElementSibling  as HTMLElement;
-        if (target.classList.contains("bloom-page")) {
+        if (target && target.classList.contains("bloom-page")) {
             this.pageChanger.transitionPage(target, false);
         }
     }

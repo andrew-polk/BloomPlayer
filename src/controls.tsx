@@ -63,7 +63,7 @@ export default class Controls {
             }
         }, false);
 
-        // For now we consider a document multimedia if it has either narration or animation.
+        // We consider a document multimedia if it has audio narration, animation (motion tool), or video.
         if (Multimedia.documentHasMultimedia()) {
             controlRoot.classList.add("multimedia");
         }
@@ -73,7 +73,7 @@ export default class Controls {
         if (Music.documentHasMusic()) {
             controlRoot.classList.add("hasMusic");
             musicButton = (<div id="musicButton" className= "button"
-                            onClick={(event: Event)  => {
+                            onClick={(event: React.MouseEvent)  => {
                                     if (this.buttonsEnabled) {
                                     const isOff: boolean  = (event.target as HTMLElement).classList.contains("off");
                                     //Start playing only if the overall multimedia is not paused, and 
@@ -111,7 +111,7 @@ export default class Controls {
                             }
                         } } />
                     <div id="playAndPauseButton" className="button"
-                        onClick={(event: Event) => {
+                        onClick={(event: React.MouseEvent) => {
                             if (this.buttonsEnabled) {
                                 paused = !paused;
                                 const btn: HTMLElement = event.target as HTMLElement;

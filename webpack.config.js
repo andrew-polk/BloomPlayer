@@ -23,7 +23,7 @@ var common_player_bits = {
            { test: /\.ts(x?)$/, loader: 'ts-loader' },
            { test: /\.less$/, loaders: ['style-loader', 'css-loader', 'less-loader'] },
            //{ test: /\.(svg|png)$/, loader: 'file',  include: path.join(__dirname, "./assets")}
-            { test: /\.(svg|png)$/, loader: 'url-loader',  include: path.join(__dirname, "./assets")}
+           { test: /\.(svg|png)$/, loader: 'url-loader',  include: path.join(__dirname, "./assets")}
         ],
     }
 };
@@ -50,13 +50,13 @@ var common_page_player_bits = {
            { test: /\.ts(x?)$/, loader: 'ts-loader' },
            { test: /\.less$/, loaders: ['style-loader', 'css-loader', 'less-loader'] },
            //{ test: /\.(svg|png)$/, loader: 'file',  include: path.join(__dirname, "./assets")}
-            { test: /\.(svg|png)$/, loader: 'url-loader',  include: path.join(__dirname, "./assets")}
+           { test: /\.(svg|png)$/, loader: 'url-loader',  include: path.join(__dirname, "./assets")}
         ],
     }
 };
 
 var dev_bits = {
-   //devtool: 'source-map', // cannot cache SourceMaps for modules and need to regenerate complete SourceMap for the chunk. It’s something for production.
+    //devtool: 'source-map', // cannot cache SourceMaps for modules and need to regenerate complete SourceMap for the chunk. It’s something for production.
     devtool: '#cheap-module-eval-source-map', //the 'cheap' here means rows only, not columns
 }
 
