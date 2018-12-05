@@ -11,12 +11,15 @@ export function SetupNarrationEvents(): void {
 export function PlayNarration(): void {
     Narration.play();
 }
+
 export function PauseNarration(): void {
     Narration.pause();
 }
+
 export function PlayAllSentences(page: HTMLElement): void {
     Narration.playAllSentences(page);
 }
+
 export function ComputeDuration(page: HTMLElement): void {
     Narration.computeDuration(page);
 }
@@ -43,15 +46,14 @@ enum Status {
 };
 
 export default class Narration {
-
     public static androidMode: boolean = false;
 
     public static documentHasNarration(): boolean {
-        return !!document.getElementsByClassName("audio-sentence").length;
+        return !!this.getDocumentAudioElements().length;
     }
 
     public static pageHasNarration(page: HTMLDivElement): boolean {
-        return !!page.getElementsByClassName("audio-sentence").length;
+        return !!this.getPageAudioElements(page).length;
     }
 
     public static play() {
@@ -86,7 +88,7 @@ export default class Narration {
 
     public static playAllSentences(page: HTMLElement): void {
         this.playerPage = page;
-        const audioElts = this.getAudioElements();
+        const audioElts = this.getPageAudioElements();
         const original: Element = page.querySelector(".ui-audioCurrent");
         for (let firstIndex = 0; firstIndex < audioElts.length; firstIndex++) {
             const first = audioElts[firstIndex];
@@ -105,7 +107,7 @@ export default class Narration {
 
     public static computeDuration(page: HTMLElement): void {
         this.playerPage = page;
-        this.segments = this.getAudioElements();
+        this.segments = this.getPageAudioElements();
         this.pageDuration = 0.0;
         this.segmentIndex = -1; // so pre-increment in getNextSegment sets to 0.
         this.startPlay = new Date();
@@ -146,7 +148,7 @@ export default class Narration {
     public static playEnded(): void {
         if (this.playingAll) {
             const current: Element = this.playerPage.querySelector(".ui-audioCurrent");
-            const audioElts = this.getAudioElements();
+            const audioElts = this.getPageAudioElements();
             let nextIndex = audioElts.indexOf(<HTMLElement> current) + 1;
             while (nextIndex < audioElts.length) {
                 const next = audioElts[nextIndex];
@@ -209,17 +211,6 @@ export default class Narration {
         }
         PageNarrationComplete.raise(page);
     }
-    // private static getDurationPlayer(): HTMLMediaElement {
-    //     return this.getAudio("bloom-duration", (audio) => {
-    //         audio.addEventListener("durationchange", (ev) => {
-    //             this.pageDuration += audio.duration;
-    //             this.getNextSegment();
-    //         });
-    //         audio.addEventListener("error", (ev) => {
-    //             this.getNextSegment(); // can't get a length for this segment, move on.
-    //         });
-    //     });
-    // }
 
     private static getNextSegment() {
         this.segmentIndex++;
@@ -262,12 +253,28 @@ export default class Narration {
         return allMatches;
     }
 
-    private static getRecordableDivs(): HTMLElement[] {
-        return this.findAll("div.bloom-editable.bloom-content1", this.playerPage);
+    private static getRecordableDivs(container: HTMLElement) {
+        return this.findAll("div.bloom-editable.bloom-content1", container);
     }
 
-    private static getAudioElements(): HTMLElement[] {
-        return [].concat.apply([], this.getRecordableDivs().map(x => this.findAll(".audio-sentence", x, true)));
+    private static getDocRecordableDivs(): HTMLElement[] {
+        return this.getRecordableDivs(document.body);
+    }
+
+    private static getDocumentAudioElements(): HTMLElement[] {
+        return [].concat.apply([], this.getDocRecordableDivs().map(x => this.findAll(".audio-sentence", x, true)));
+    }
+
+    // Optional param is for use when 'playerPage' has NOT been initialized.
+    // Not using the optional param assumes 'playerPage' has been initialized
+    private static getPageRecordableDivs(page?: HTMLElement): HTMLElement[] {
+        return this.getRecordableDivs(page ? page : this.playerPage);
+    }
+
+    // Optional param is for use when 'playerPage' has NOT been initialized.
+    // Not using the optional param assumes 'playerPage' has been initialized
+    private static getPageAudioElements(page?: HTMLElement): HTMLElement[] {
+        return [].concat.apply([], this.getPageRecordableDivs(page).map(x => this.findAll(".audio-sentence", x, true)));
     }
 
     private static setCurrentSpan(current: Element, changeTo: HTMLElement): void {
