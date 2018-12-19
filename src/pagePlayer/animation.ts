@@ -95,7 +95,7 @@ export default class Animation {
         (<CSSStyleSheet> stylesheet).insertRule(
             ".bloom-pausable {animation-play-state: paused; -webkit-animation-play-state: paused}",
             (<CSSStyleSheet> stylesheet).cssRules.length);
-        this.permanentRuleCount++; // not really permanent, but not to be messed with.    
+        this.permanentRuleCount++; // not really permanent, but not to be messed with.
     }
 
     public SetFadePageTransitionMilliseconds(duration: number) {
@@ -313,8 +313,8 @@ export default class Animation {
 
     private updateWrapDivSize(wrapDiv: HTMLElement) {
         const imageAspectRatio = parseFloat(wrapDiv.getAttribute("data-aspectRatio"));
-        const viewWidth = this.animationView.clientWidth; // getBoundingClientRect().width;
-        const viewHeight = this.animationView.clientHeight; // getBoundingClientRect().height;
+        let viewWidth = this.animationView.clientWidth; // getBoundingClientRect().width;
+        let viewHeight = this.animationView.clientHeight; // getBoundingClientRect().height;
         const viewAspectRatio = viewWidth / viewHeight;
         let oldStyle = wrapDiv.getAttribute("style"); // may have visibility: hidden, which we need.
         // If it has anything else (e.g., dimensions for a different orientation), remove them.
@@ -326,17 +326,31 @@ export default class Animation {
         // We always need the wrapDiv to have a white background, in case the image we're
         // animating has transparent regions.
         oldStyle += "background-color: white;";
+
+        const scale = 1; //this.getCurrentScale();
+        viewWidth = viewWidth / scale;
+        viewHeight = viewHeight / scale;
+
         if (imageAspectRatio < viewAspectRatio) {
             // black bars on side
-            const imageWidth = viewHeight * imageAspectRatio;
+            const imageWidth = (viewHeight * imageAspectRatio) * scale; // / scale;
             wrapDiv.setAttribute("style", oldStyle + " height: 100%; width: " + imageWidth
-                + "px; left: " + (viewWidth - imageWidth) / 2  + "px");
+                + "px; left: " + (viewWidth - imageWidth) / 2 + "px");
         } else {
             // black bars top and bottom
             const imageHeight = viewWidth / imageAspectRatio;
             wrapDiv.setAttribute("style", oldStyle + " width: 100%; height: " + imageHeight
                 + "px; top: " + (viewHeight - imageHeight) / 2  + "px");
         }
+    }
+
+    private getCurrentScale() {
+        let scaleY = 1.0;
+        const scaledElt = document.getElementById("pageViewer");
+        if (scaledElt) {
+            scaleY = scaledElt.getBoundingClientRect().height / scaledElt.offsetHeight;
+        }
+        return scaleY;
     }
 
     // Adjust the wrap div for a change of orientation. The name is slightly obsolete

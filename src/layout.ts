@@ -30,16 +30,16 @@ export function SetupLayoutEvents() {
 export function Scale(): number {
     //Enhance: would using meta.viewport be better?
     //http://stackoverflow.com/questions/8735457/scale-fit-mobile-web-content-using-viewport-meta-tag?rq=1
-
-    const pageWidth = document.querySelectorAll(".currentPage")[0].scrollWidth;
-    const pageHeight = document.querySelectorAll(".currentPage")[0].scrollHeight;
-    if (!pageWidth) {
-        debugger;
-    }
-    //using "self" here, instead of "window", makes it get the dimension of the enclosing iframe when
-    //we are running in a frame instead of getting the whole windows (e.g. intel xdk "emulator" (which
-    //is nothing of the sort... according to intel docs, it's just an iframe in web-kit) )
-    return Math.min((self.innerWidth ) / pageWidth, (self.innerHeight ) / pageHeight);
+return 1;
+    // const pageWidth = document.querySelectorAll(".currentPage")[0].scrollWidth;
+    // const pageHeight = document.querySelectorAll(".currentPage")[0].scrollHeight;
+    // if (!pageWidth) {
+    //     debugger;
+    // }
+    // //using "self" here, instead of "window", makes it get the dimension of the enclosing iframe when
+    // //we are running in a frame instead of getting the whole windows (e.g. intel xdk "emulator" (which
+    // //is nothing of the sort... according to intel docs, it's just an iframe in web-kit) )
+    // return Math.min((self.innerWidth ) / pageWidth, (self.innerHeight ) / pageHeight);
 }
 
 export function IsLandscape() {
